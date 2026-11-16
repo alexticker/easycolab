@@ -303,21 +303,37 @@ def cmd_auth_status():
         }))
 
 
-def _build_rclone_drive_conf() -> str:
+ADC_PUBLIC_CLIENT_PREFIX = "764086051850-"
+
+
+def _build_rclone_drive_conf(token_path: str = TOKEN_CONFIG_PATH) -> str:
     """
-    复用本地已授权的 Google Colab CLI OAuth 凭据 (含 drive.file 权限域)，
-    生成云端 rclone Google Drive 配置，使无浏览器唤醒的 G4 实例也能自动挂载/同步 Google Drive，
-    持久化保存 ComfyUI 自定义节点、模型与工作流。
+    当用户配置了自有 Google Cloud OAuth Client（或显式携带 quota_project_id）时，
+    生成云端 rclone Google Drive 备用配置。
+    注：colab-cli 内置的公共 ADC Client (764086051850-*) 未绑定 quota_project 时访问
+    drive.googleapis.com 会被 Google 直接返回 403 SERVICE_DISABLED，此时跳过 rclone 配置，
+    生成的成片由客户端自动拉取保存至本地电脑。
     """
-    if not os.path.exists(TOKEN_CONFIG_PATH):
+    if not os.path.exists(token_path):
         return ""
     try:
-        creds = Credentials.from_authorized_user_file(TOKEN_CONFIG_PATH, PUBLIC_SCOPES)
+        with open(token_path, "r", encoding="utf-8") as rf:
+            pre_raw = json.load(rf)
+        pre_cid = str(pre_raw.get("client_id") or "").strip()
+        pre_qp = str(pre_raw.get("quota_project_id") or "").strip()
+        if pre_cid.startswith(ADC_PUBLIC_CLIENT_PREFIX) and not pre_qp:
+            return ""
+
+        creds = Credentials.from_authorized_user_file(token_path, PUBLIC_SCOPES)
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
-            with open(TOKEN_CONFIG_PATH, "w", encoding="utf-8") as f:
+            with open(token_path, "w", encoding="utf-8") as f:
                 f.write(creds.to_json())
         raw = json.loads(creds.to_json())
+        client_id = str(raw.get("client_id") or "").strip()
+        quota_project = str(raw.get("quota_project_id") or "").strip()
+        if client_id.startswith(ADC_PUBLIC_CLIENT_PREFIX) and not quota_project:
+            return ""
         scopes = raw.get("scopes") or []
         drive_scope = "drive" if any(s.endswith("/drive") for s in scopes) else (
             "drive.file" if any("drive.file" in s for s in scopes) else ""
@@ -334,7 +350,7 @@ def _build_rclone_drive_conf() -> str:
         lines = [
             "[easycolab_gdrive]",
             "type = drive",
-            f"client_id = {raw.get('client_id', '')}",
+            f"client_id = {client_id}",
             f"client_secret = {raw.get('client_secret', '')}",
             f"scope = {drive_scope}",
             f"token = {json.dumps(tok_obj, separators=(',', ':'))}",
@@ -395,15 +411,25 @@ def cmd_stop_all():
                     rt = ColabRuntime(s.url, s.token, kernel_id=s.kernel_id)
                     try:
                         rt.execute_code(
-                            "import urllib.request\n"
+                            "import os, urllib.request\n"
                             "try:\n"
                             "    urllib.request.urlopen(urllib.request.Request("
                             "'http://127.0.0.1:27860/minimax_api/comfyui/sync_drive', "
                             "data=b'{}', headers={'Content-Type':'application/json'}, method='POST'), timeout=18)\n"
                             "except Exception:\n"
+                            "    pass\n"
+                            "try:\n"
+                            "    os.sync()\n"
+                            "except Exception:\n"
+                            "    pass\n"
+                            "try:\n"
+                            "    if os.path.isdir('/content/drive/MyDrive'):\n"
+                            "        from google.colab import drive\n"
+                            "        drive.flush_and_unmount()\n"
+                            "except Exception:\n"
                             "    pass\n",
                             allow_stdin=False,
-                            timeout=22,
+                            timeout=30,
                         )
                     except Exception:
                         pass
@@ -822,24 +848,36 @@ if not shutil.which("nginx"):
     # apt may start the distribution's default site.
     subprocess.run(["service", "nginx", "stop"], check=False)
 
-# 0. 配置无网页模式下的 Google Drive 云盘自动挂载/高速同步 (供模型库与 ComfyUI 节点持久化)
+# 0. 清理旧实例可能残留的公共 ADC 失效 rclone 配置；若未通过原生 DriveFS 挂载且用户配置了自有 OAuth rclone，则启用备用挂载
+rc_existing = os.path.expanduser("~/.config/rclone/rclone.conf")
 rc_stage = "/content/.easycolab_rclone.conf"
 if os.path.exists(rc_stage):
     rc_dir = os.path.expanduser("~/.config/rclone")
     os.makedirs(rc_dir, mode=0o700, exist_ok=True)
-    rc_dst = os.path.join(rc_dir, "rclone.conf")
-    shutil.move(rc_stage, rc_dst)
-    os.chmod(rc_dst, 0o600)
+    shutil.move(rc_stage, rc_existing)
+    os.chmod(rc_existing, 0o600)
+elif os.path.exists(rc_existing):
+    try:
+        rc_txt = open(rc_existing, "r", encoding="utf-8", errors="ignore").read()
+        if "client_id = 764086051850-" in rc_txt:
+            os.remove(rc_existing)
+    except Exception:
+        pass
 
-if os.path.exists(os.path.expanduser("~/.config/rclone/rclone.conf")):
+_native_drive_ok = (
+    os.path.isdir("/content/drive/MyDrive")
+    and os.path.exists("/content")
+    and os.stat("/content/drive/MyDrive").st_dev != os.stat("/content").st_dev
+)
+if not _native_drive_ok and os.path.exists(rc_existing):
     if not shutil.which("rclone"):
         subprocess.run(
             ["bash", "-lc", "curl -fsSL https://downloads.rclone.org/rclone-current-linux-amd64.zip -o /tmp/rclone.zip && unzip -q -o /tmp/rclone.zip -d /tmp && cp /tmp/rclone-*-linux-amd64/rclone /usr/local/bin/rclone && chmod +x /usr/local/bin/rclone && rm -rf /tmp/rclone*"],
             check=False,
         )
     if shutil.which("rclone") and not os.path.ismount("/content/drive/MyDrive"):
-        subprocess.run(["rclone", "mkdir", "easycolab_gdrive:EasyColab_Drive"], check=False)
-        if os.path.exists("/dev/fuse") and (shutil.which("fusermount3") or shutil.which("fusermount")):
+        mk_res = subprocess.run(["rclone", "mkdir", "easycolab_gdrive:EasyColab_Drive"], check=False)
+        if mk_res.returncode == 0 and os.path.exists("/dev/fuse") and (shutil.which("fusermount3") or shutil.which("fusermount")):
             os.makedirs("/content/drive/MyDrive", exist_ok=True)
             subprocess.Popen(
                 [
@@ -856,11 +894,10 @@ if os.path.exists(os.path.expanduser("~/.config/rclone/rclone.conf")):
             )
             for _ in range(10):
                 if os.path.ismount("/content/drive/MyDrive"):
-                    print("✅ 已通过 Google OAuth 自动挂载 Google Drive (/content/drive/MyDrive)！", flush=True)
+                    print("✅ 已通过自定义 OAuth 自动挂载 Google Drive (/content/drive/MyDrive)！", flush=True)
                     break
                 time.sleep(0.5)
             else:
-                # 容器未开放 FUSE 挂载权限时清理空目录，由 app.py 自动启用 rclone 云盘高速双向同步
                 try:
                     if not os.listdir("/content/drive/MyDrive"):
                         os.rmdir("/content/drive/MyDrive")

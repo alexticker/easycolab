@@ -1271,7 +1271,19 @@ def setup_colab_ramdisk() -> Optional[str]:
 RAM_ROOT_DIR = setup_colab_ramdisk()
 
 # 如果挂载了 Google Drive，优先将模型持久化保存在云盘 EasyColab_Models（并自动兼容读取历史 Aevix_Models / MiniMax_H3_Models 目录）
-DRIVE_MOUNTED = os.path.exists("/content/drive/MyDrive")
+def _is_drive_mounted_live() -> bool:
+    if not os.path.isdir("/content/drive/MyDrive"):
+        return False
+    if os.path.exists("/content"):
+        try:
+            return os.stat("/content/drive/MyDrive").st_dev != os.stat("/content").st_dev
+        except Exception:
+            return False
+    return True
+
+
+DRIVE_MOUNTED = _is_drive_mounted_live()
+_RCLONE_DRIVE_PROBE_CACHE: Dict[str, Any] = {"mtime": -1.0, "ts": 0.0, "ok": False}
 
 
 def _has_rclone_drive_remote() -> bool:
@@ -1279,8 +1291,32 @@ def _has_rclone_drive_remote() -> bool:
     if not os.path.exists(rc_path) or not shutil.which("rclone"):
         return False
     try:
+        st_mtime = os.path.getmtime(rc_path)
         with open(rc_path, "r", encoding="utf-8", errors="ignore") as f:
-            return "[easycolab_gdrive]" in f.read()
+            txt = f.read()
+        if "[easycolab_gdrive]" not in txt:
+            return False
+        # 公共 ADC Client (764086051850-*) 无 quota_project 时会被 Google Drive API 403 拒绝，不可视为有效云盘远程
+        if "client_id = 764086051850-" in txt:
+            return False
+        now = time.time()
+        if (
+            _RCLONE_DRIVE_PROBE_CACHE["mtime"] == st_mtime
+            and (_RCLONE_DRIVE_PROBE_CACHE["ok"] or (now - _RCLONE_DRIVE_PROBE_CACHE["ts"]) < 120.0)
+        ):
+            return bool(_RCLONE_DRIVE_PROBE_CACHE["ok"])
+        probe = subprocess.run(
+            ["rclone", "about", "easycolab_gdrive:", "--json"],
+            capture_output=True,
+            text=True,
+            timeout=8,
+            check=False,
+        )
+        ok = probe.returncode == 0
+        _RCLONE_DRIVE_PROBE_CACHE["mtime"] = st_mtime
+        _RCLONE_DRIVE_PROBE_CACHE["ts"] = now
+        _RCLONE_DRIVE_PROBE_CACHE["ok"] = ok
+        return ok
     except Exception:
         return False
 
@@ -2481,6 +2517,91 @@ os.makedirs(DEFAULT_OUTPUT_DIR, exist_ok=True)
 os.makedirs(os.path.join(os.getcwd(), "models"), exist_ok=True)
 
 
+def _refresh_drive_mount_state() -> bool:
+    """动态检测 Google Drive 真实挂载状态并实时更新模型与成片输出目录（支持运行中热挂载生效）"""
+    global DRIVE_MOUNTED, MODEL_BASE_ROOT, DEFAULT_OUTPUT_DIR
+    mounted = _is_drive_mounted_live()
+    if mounted != DRIVE_MOUNTED:
+        DRIVE_MOUNTED = mounted
+        MODEL_BASE_ROOT = (
+            "/content/drive/MyDrive/EasyColab_Models"
+            if mounted
+            else os.path.join(os.getcwd(), "models")
+        )
+        os.environ["DIFFSYNTH_MODEL_BASE_PATH"] = MODEL_BASE_ROOT
+        DEFAULT_OUTPUT_DIR = (
+            "/content/drive/MyDrive/EasyColab_Outputs"
+            if mounted
+            else os.path.join(os.getcwd(), "outputs")
+        )
+        try:
+            os.makedirs(DEFAULT_OUTPUT_DIR, exist_ok=True)
+            if mounted:
+                os.makedirs(MODEL_BASE_ROOT, exist_ok=True)
+        except Exception:
+            pass
+    return DRIVE_MOUNTED
+
+
+def _flush_drive_file(file_path: str) -> None:
+    """强制将写入 /content/drive/MyDrive 的成片刷盘至 DriveFS 守护进程，防止生成后立即释放实例导致文件丢失"""
+    if not file_path or not os.path.exists(file_path):
+        return
+    try:
+        with open(file_path, "rb+") as f:
+            os.fsync(f.fileno())
+    except Exception:
+        try:
+            with open(file_path, "rb") as f:
+                os.fsync(f.fileno())
+        except Exception:
+            pass
+    if hasattr(os, "sync") and file_path.startswith("/content/drive/"):
+        try:
+            os.sync()
+        except Exception:
+            pass
+
+
+def _persist_generated_output_to_drive(output_path: str) -> str:
+    """确保生成的视频或图片真正持久化到 Google Drive（原生挂载实时刷盘或自定义 rclone 远端同步）"""
+    if not output_path or not os.path.exists(output_path):
+        return output_path
+    mounted = _refresh_drive_mount_state()
+    if mounted:
+        if not output_path.startswith("/content/drive/MyDrive/"):
+            drive_out_dir = "/content/drive/MyDrive/EasyColab_Outputs"
+            os.makedirs(drive_out_dir, exist_ok=True)
+            dst_path = os.path.join(drive_out_dir, os.path.basename(output_path))
+            shutil.copy2(output_path, dst_path)
+            _flush_drive_file(dst_path)
+            return dst_path
+        _flush_drive_file(output_path)
+        return output_path
+    if _has_rclone_drive_remote():
+        try:
+            cp_res = subprocess.run(
+                [
+                    "rclone", "copy",
+                    output_path,
+                    "easycolab_gdrive:EasyColab_Drive/EasyColab_Outputs",
+                    "--drive-chunk-size", "64M",
+                ],
+                capture_output=True,
+                text=True,
+                timeout=90,
+                check=False,
+            )
+            if cp_res.returncode == 0:
+                print(f"[Google Drive 同步完成] {os.path.basename(output_path)} -> EasyColab_Drive/EasyColab_Outputs")
+            else:
+                err_tail = (cp_res.stderr or cp_res.stdout or "").strip()[-200:]
+                print(f"[Google Drive 同步失败] {os.path.basename(output_path)}: {err_tail}")
+        except Exception as sync_err:
+            print(f"[Google Drive 同步异常] {os.path.basename(output_path)}: {sync_err}")
+    return output_path
+
+
 # ==============================================================================
 # 借鉴 comfy-colab-kit 的 8 线程 HTTP Range 并行极速下载器 (400~700 MB/s)
 # ==============================================================================
@@ -3075,6 +3196,7 @@ def _find_existing_model_file(model_id: str, fname: str, _allow_peer_share: bool
 
 def check_model_files_status(model_id: Optional[str] = None) -> Dict[str, Any]:
     """检查指定开源模型在内存盘/磁盘/云盘上的权重文件完整性与大小"""
+    _refresh_drive_mount_state()
     norm_id = _normalize_builtin_model_alias(model_id)
     target_id = norm_id if (norm_id and norm_id in MODEL_CATALOG) else SELECTED_MODEL_ID
     spec = MODEL_CATALOG[target_id]
@@ -3179,6 +3301,7 @@ def _get_storage_metrics_dict(refresh_drive: bool = False) -> Dict[str, Any]:
             pass
 
     now = time.time()
+    _refresh_drive_mount_state()
     if DRIVE_MOUNTED and (refresh_drive or (now - _CACHED_DRIVE_METRICS["ts"]) >= 15.0):
         if os.path.exists("/content/drive/MyDrive"):
             try:
@@ -3189,6 +3312,11 @@ def _get_storage_metrics_dict(refresh_drive: bool = False) -> Dict[str, Any]:
                 _CACHED_DRIVE_METRICS["ts"] = now
             except Exception:
                 pass
+    elif not DRIVE_MOUNTED:
+        _CACHED_DRIVE_METRICS["drive_total_gb"] = 0.0
+        _CACHED_DRIVE_METRICS["drive_free_gb"] = 0.0
+        _CACHED_DRIVE_METRICS["drive_used_gb"] = 0.0
+        _CACHED_DRIVE_METRICS["ts"] = now
 
     return {
         "ram_total_gb": ram_total_gb,
@@ -3421,7 +3549,7 @@ def build_structured_prompt(
 # ==============================================================================
 def _async_backup_to_drive(src_file: str, dst_dir: str, fname: str):
     """在后台线程中将内存盘/NVMe下载好的权重同步到 Google Drive，不阻塞用户加载模型"""
-    if not DRIVE_MOUNTED:
+    if not _refresh_drive_mount_state():
         return
     try:
         dst_file = os.path.join(dst_dir, fname)
@@ -3432,6 +3560,7 @@ def _async_backup_to_drive(src_file: str, dst_dir: str, fname: str):
         with open(src_file, "rb") as rf, open(tmp_dst, "wb") as wf:
             shutil.copyfileobj(rf, wf, length=32 * 1024 * 1024)
         os.replace(tmp_dst, dst_file)
+        _flush_drive_file(dst_file)
         print(f"[后台云盘同步完成] {fname} 已持久化保存至 Google Drive")
     except Exception as e:
         print(f"[后台云盘同步跳过] {fname}: {e}")
@@ -3440,6 +3569,7 @@ def _async_backup_to_drive(src_file: str, dst_dir: str, fname: str):
 def download_model_weights_core(model_id: Optional[str] = None, hf_token: str = "") -> Tuple[bool, str]:
     global SELECTED_MODEL_ID
     touch_activity()
+    _refresh_drive_mount_state()
     if MODEL_DOWNLOAD_STATE["is_downloading"]:
         return False, "模型正在下载中，请稍候..."
 
@@ -5548,6 +5678,8 @@ def generate_video(
                 get_history_videos(save_dir),
             )
 
+    if _refresh_drive_mount_state() and save_dir == os.path.join(os.getcwd(), "outputs"):
+        save_dir = DEFAULT_OUTPUT_DIR
     os.makedirs(save_dir, exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"minimax_h3_{task_mode}_{timestamp}_seed{seed}.mp4"
@@ -5586,6 +5718,7 @@ def generate_video(
                 fps=int(fps),
                 audio_sample_rate=32000,
             )
+            output_path = _persist_generated_output_to_drive(output_path)
             video = None
             audio = None
             _reclaim_transient_gpu_memory()
@@ -6374,7 +6507,7 @@ def _get_comfy_preset_packs_status(persist_root: str) -> List[Dict[str, Any]]:
 
 def _resolve_comfyui_persistence_paths() -> Tuple[str, str, str, str, bool]:
     comfy_root = "/content/ComfyUI" if os.path.exists("/content") else os.path.join(os.getcwd(), "ComfyUI")
-    if os.path.exists("/content/drive/MyDrive"):
+    if _refresh_drive_mount_state():
         persist_root = "/content/drive/MyDrive/EasyColab_ComfyUI"
         return comfy_root, persist_root, "drive_symlink", "Google Drive 实时软链直连", True
     if _has_rclone_drive_remote():
@@ -7415,6 +7548,17 @@ def disconnect_colab_runtime() -> str:
     except Exception:
         pass
     try:
+        if hasattr(os, "sync"):
+            os.sync()
+    except Exception:
+        pass
+    try:
+        if _is_drive_mounted_live():
+            from google.colab import drive
+            drive.flush_and_unmount()
+    except Exception:
+        pass
+    try:
         from google.colab import runtime
         runtime.unassign()
         return "🛑 已向 Colab 发送释放运行时指令，实例即将关闭并停止扣除计算单元。"
@@ -8013,6 +8157,7 @@ def _run_async_generation_job(job_id: str, req: GenerateVideoRequest):
             JOBS[job_id]["message"] = "图像编辑/重绘模式下请至少拖入一张输入图片"
             return
 
+        _refresh_drive_mount_state()
         os.makedirs(DEFAULT_OUTPUT_DIR, exist_ok=True)
         last_filename = None
         last_seed = base_seed
@@ -8208,6 +8353,7 @@ def _run_async_generation_job(job_id: str, req: GenerateVideoRequest):
 
                 if not os.path.exists(output_path) or os.path.getsize(output_path) < 256:
                     raise RuntimeError("输出媒体文件未成功生成或写入为空")
+                output_path = _persist_generated_output_to_drive(output_path)
 
                 with CONSOLE_LOCK:
                     ACTIVE_TQDM_BARS.clear()
@@ -8216,7 +8362,7 @@ def _run_async_generation_job(job_id: str, req: GenerateVideoRequest):
             sub_elapsed = round(time.time() - sub_start, 1)
             last_filename = filename
             kind_cn = "图像" if media_type == "image" else "视频"
-            print(f"[{spec['name']}] {kind_cn}生成完成 | 耗时 {sub_elapsed}s | Seed: {current_seed} | 文件: {filename}")
+            print(f"[{spec['name']}] {kind_cn}生成完成 | 耗时 {sub_elapsed}s | Seed: {current_seed} | 已保存: {output_path}")
             media_item = {
                 "index": batch_idx + 1,
                 "seed": current_seed,
@@ -10017,8 +10163,13 @@ def attach_macos_api_routes(app: FastAPI):
     @app.get("/minimax_api/media/{filename}")
     def api_download_media(filename: str):
         touch_activity()
+        _refresh_drive_mount_state()
         safe_name = os.path.basename(filename)
         file_path = os.path.join(DEFAULT_OUTPUT_DIR, safe_name)
+        if not os.path.exists(file_path):
+            local_fallback = os.path.join(os.getcwd(), "outputs", safe_name)
+            if os.path.exists(local_fallback):
+                file_path = local_fallback
         if not os.path.exists(file_path) and DRIVE_MOUNTED:
             for leg_out in LEGACY_DRIVE_OUTPUT_DIRS:
                 alt_path = os.path.join(leg_out, safe_name)
