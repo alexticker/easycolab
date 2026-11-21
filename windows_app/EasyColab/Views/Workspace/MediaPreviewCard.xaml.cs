@@ -199,7 +199,6 @@ public sealed partial class MediaPreviewCard : UserControl
             _activeMediaSource = source;
             _loadedVideoPath = path;
             VideoPlayer.Source = source;
-            VideoPlayer.MediaPlayer?.Play();
         }
         catch (Exception ex)
         {

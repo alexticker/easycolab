@@ -60,7 +60,7 @@
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Stretch"
                         AreTransportControlsEnabled="True"
-                        AutoPlay="True"
+                        AutoPlay="False"
                         Stretch="Uniform"
                         Visibility="Collapsed" />
 
