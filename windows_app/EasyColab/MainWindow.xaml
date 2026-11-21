@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="EasyColab.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="EasyColab">
+
+    <Window.SystemBackdrop>
+        <MicaBackdrop />
+    </Window.SystemBackdrop>
+
+    <Grid x:Name="RootGrid">
+        <Grid.KeyboardAccelerators>
+            <KeyboardAccelerator
+                Invoked="ToggleLanguageAccelerator_Invoked"
+                Key="L"
+                Modifiers="Control,Shift" />
+            <KeyboardAccelerator
+                Invoked="OpenGuideAccelerator_Invoked"
+                Key="F1" />
+        </Grid.KeyboardAccelerators>
+    </Grid>
+</Window>

@@ -21,57 +21,42 @@ permissions:
   contents: write
 
 jobs:
-  build-windows-x64:
-    name: Build Windows x64 Standalone EXE
+  build-windows:
+    name: Build Windows ${{ matrix.arch }} (WinUI 3)
     runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x64, arm64]
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python 3.12
+      - name: Set up .NET 10 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Set up Python 3.12 (wheel download host)
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          cache: "pip"
-          cache-dependency-path: windows_app/requirements-windows.txt
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install -r windows_app/requirements-windows.txt
-
-      - name: Generate multi-size AppIcon.ico
-        run: python windows_app/generate_icon.py
-
-      - name: Build standalone EasyColab.exe via PyInstaller
-        run: |
-          pyinstaller --noconfirm --clean `
-            --distpath dist `
-            --workpath build/pyinstaller `
-            windows_app/EasyColab.spec
-
-      - name: Smoke-test packaged EasyColab.exe (CLI bridge & native main window)
+      - name: Build & package EasyColab (WinUI 3 + embedded Python bridge runtime)
         shell: pwsh
-        run: |
-          $out = & .\dist\EasyColab\EasyColab.exe --bridge-cli auth_status
-          Write-Host "Bridge CLI smoke output: $out"
-          if (-not ($out -match '"ok"')) {
-            throw "EasyColab.exe --bridge-cli smoke test failed!"
-          }
-          & .\windows_app\test_packaged_window.ps1 -ExePath .\dist\EasyColab\EasyColab.exe
+        run: ./windows_app/build_windows_app.ps1 -Arch ${{ matrix.arch }}
 
-      - name: Package EasyColab-Windows-x64.zip
+      - name: Smoke-test native window startup
+        if: matrix.arch == 'x64'
         shell: pwsh
-        run: |
-          Compress-Archive -Path "dist\EasyColab" -DestinationPath "EasyColab-Windows-x64.zip" -Force
-          Get-Item "EasyColab-Windows-x64.zip" | Select-Object Name, Length
+        run: ./windows_app/test_packaged_window.ps1 -ExePath ./dist/EasyColab/EasyColab.exe
 
-      - name: Upload EasyColab-Windows-x64.zip Artifact
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: EasyColab-Windows-x64
-          path: EasyColab-Windows-x64.zip
+          name: EasyColab-Windows-${{ matrix.arch }}
+          path: EasyColab-Windows-${{ matrix.arch }}.zip
           if-no-files-found: error
           retention-days: 30
 
@@ -79,5 +64,5 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: EasyColab-Windows-x64.zip
+          files: EasyColab-Windows-${{ matrix.arch }}.zip
           generate_release_notes: true

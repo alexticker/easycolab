@@ -1,0 +1,598 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="EasyColab.Views.Dialogs.AddCustomHFModelDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:loc="using:EasyColab.Localization"
+    HorizontalAlignment="Stretch"
+    VerticalAlignment="Stretch"
+    Visibility="Collapsed">
+
+    <UserControl.KeyboardAccelerators>
+        <KeyboardAccelerator Key="Escape" Invoked="OnEscapeInvoked" />
+    </UserControl.KeyboardAccelerators>
+
+    <UserControl.Resources>
+        <Style x:Key="FormLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Foreground" Value="{ThemeResource StudioTextPrimaryBrush}" />
+        </Style>
+
+        <Style x:Key="PatternPillButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="{ThemeResource StudioPrimaryOpacity06Brush}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="11" />
+            <Setter Property="Padding" Value="8,3" />
+            <Setter Property="MinHeight" Value="0" />
+            <Setter Property="MinWidth" Value="0" />
+            <Setter Property="FontFamily" Value="{StaticResource StudioMonoFont}" />
+            <Setter Property="FontSize" Value="10.5" />
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="Foreground" Value="{ThemeResource StudioTextPrimaryBrush}" />
+        </Style>
+
+        <Style x:Key="InlineLinkButtonStyle" TargetType="Button" BasedOn="{StaticResource StudioPlainButtonStyle}">
+            <Setter Property="Foreground" Value="{ThemeResource StudioAccentBlueBrush}" />
+        </Style>
+    </UserControl.Resources>
+
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <!-- Dark Scrim Backdrop -->
+        <Border
+            x:Name="ScrimBorder"
+            Background="#88000000"
+            PointerPressed="OnScrimPointerPressed" />
+
+        <!-- Centered Elevated Dialog Card (~920x720, shrinks cleanly on smaller windows) -->
+        <Border
+            MaxWidth="920"
+            MaxHeight="720"
+            Margin="28"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            Background="{ThemeResource StudioWorkspaceCardFillBrush}"
+            BorderBrush="{ThemeResource StudioCardBorderBrush}"
+            BorderThickness="1"
+            CornerRadius="12">
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="1" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="1" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Top Header -->
+                <Grid Grid.Row="0" Padding="18,16,18,13" ColumnSpacing="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border
+                        Grid.Column="0"
+                        Width="32"
+                        Height="32"
+                        VerticalAlignment="Center"
+                        Background="{ThemeResource StudioAccentBlueFillBrush}"
+                        CornerRadius="8">
+                        <FontIcon
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontSize="15"
+                            Foreground="{ThemeResource StudioAccentBlueBrush}"
+                            Glyph="&#xECC8;" />
+                    </Border>
+
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                        <TextBlock
+                            FontSize="15"
+                            FontWeight="Bold"
+                            Foreground="{ThemeResource StudioTextPrimaryBrush}"
+                            Text="{loc:L Zh='添加自定义 HuggingFace 模型仓库', En='Add Custom HuggingFace Repository'}" />
+                        <TextBlock
+                            FontSize="11"
+                            Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                            Text="{loc:L Zh='实时拉取 HuggingFace 热门趋势模型一键填入，或输入任意 Repo ID；受限/需登录模型请填写 HF Token 并同意协议', En='Pick live trending models from HuggingFace or enter any Repo ID; provide HF Token for gated/private repos'}"
+                            TextWrapping="Wrap" />
+                    </StackPanel>
+
+                    <Button
+                        Grid.Column="2"
+                        VerticalAlignment="Top"
+                        Click="OnCancelClick"
+                        Style="{StaticResource StudioPlainButtonStyle}"
+                        ToolTipService.ToolTip="{loc:L Zh='关闭', En='Close'}">
+                        <Border
+                            Width="26"
+                            Height="26"
+                            Background="{ThemeResource StudioPrimaryOpacity06Brush}"
+                            CornerRadius="13">
+                            <FontIcon
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                FontSize="11"
+                                Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                Glyph="&#xE711;" />
+                        </Border>
+                    </Button>
+                </Grid>
+
+                <Rectangle Grid.Row="1" Fill="{ThemeResource StudioSplitDividerBrush}" />
+
+                <!-- Scrollable Main Form Content -->
+                <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Padding="18,14,18,16" Spacing="13">
+
+                        <!-- Trending & Search Section -->
+                        <StackPanel Spacing="8">
+                            <!-- Trending Header + Category Pills + Refresh -->
+                            <Grid ColumnSpacing="8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel
+                                    Grid.Column="0"
+                                    VerticalAlignment="Center"
+                                    Orientation="Horizontal"
+                                    Spacing="6">
+                                    <FontIcon
+                                        FontSize="12.5"
+                                        Foreground="{ThemeResource StudioAccentBlueBrush}"
+                                        Glyph="&#xE9D2;" />
+                                    <TextBlock
+                                        VerticalAlignment="Center"
+                                        FontSize="12"
+                                        FontWeight="Bold"
+                                        Foreground="{ThemeResource StudioTextPrimaryBrush}"
+                                        Text="{loc:L Zh='HuggingFace 实时热榜与搜索 (含参数量 &amp; Colab 显存部署评估)', En='Live HuggingFace Trending &amp; Search (with Params &amp; Colab Fit)'}"
+                                        TextTrimming="CharacterEllipsis" />
+                                </StackPanel>
+
+                                <StackPanel
+                                    Grid.Column="1"
+                                    VerticalAlignment="Center"
+                                    Orientation="Horizontal"
+                                    Spacing="5">
+                                    <Button
+                                        x:Name="TabAllButton"
+                                        Click="OnCategoryTabClick"
+                                        Style="{StaticResource StudioPlainButtonStyle}"
+                                        Tag="all">
+                                        <Border x:Name="TabAllBorder" Padding="9,3.5" CornerRadius="10">
+                                            <TextBlock
+                                                x:Name="TabAllText"
+                                                FontSize="10.5"
+                                                Text="{loc:L Zh='综合热榜', En='Trending'}" />
+                                        </Border>
+                                    </Button>
+
+                                    <Button
+                                        x:Name="TabGgufButton"
+                                        Click="OnCategoryTabClick"
+                                        Style="{StaticResource StudioPlainButtonStyle}"
+                                        Tag="gguf">
+                                        <Border x:Name="TabGgufBorder" Padding="9,3.5" CornerRadius="10">
+                                            <TextBlock
+                                                x:Name="TabGgufText"
+                                                FontSize="10.5"
+                                                Text="{loc:L Zh='GGUF 量化', En='GGUF'}" />
+                                        </Border>
+                                    </Button>
+
+                                    <Button
+                                        x:Name="TabLlmButton"
+                                        Click="OnCategoryTabClick"
+                                        Style="{StaticResource StudioPlainButtonStyle}"
+                                        Tag="llm">
+                                        <Border x:Name="TabLlmBorder" Padding="9,3.5" CornerRadius="10">
+                                            <TextBlock
+                                                x:Name="TabLlmText"
+                                                FontSize="10.5"
+                                                Text="{loc:L Zh='对话 / 视觉', En='LLM / VLM'}" />
+                                        </Border>
+                                    </Button>
+
+                                    <Button
+                                        x:Name="TabImageVideoButton"
+                                        Click="OnCategoryTabClick"
+                                        Style="{StaticResource StudioPlainButtonStyle}"
+                                        Tag="image_video">
+                                        <Border x:Name="TabImageVideoBorder" Padding="9,3.5" CornerRadius="10">
+                                            <TextBlock
+                                                x:Name="TabImageVideoText"
+                                                FontSize="10.5"
+                                                Text="{loc:L Zh='生图 / 视频', En='Image / Video'}" />
+                                        </Border>
+                                    </Button>
+
+                                    <Button
+                                        Margin="4,0,0,0"
+                                        Click="OnRefreshTrendingClick"
+                                        Style="{StaticResource InlineLinkButtonStyle}">
+                                        <StackPanel Orientation="Horizontal" Spacing="4">
+                                            <ProgressRing
+                                                x:Name="RefreshSpinner"
+                                                Width="12"
+                                                Height="12"
+                                                IsActive="False"
+                                                Visibility="Collapsed" />
+                                            <FontIcon
+                                                x:Name="RefreshIcon"
+                                                FontSize="10.5"
+                                                Foreground="{ThemeResource StudioAccentBlueBrush}"
+                                                Glyph="&#xE72C;" />
+                                            <TextBlock
+                                                FontSize="10.5"
+                                                FontWeight="SemiBold"
+                                                Foreground="{ThemeResource StudioAccentBlueBrush}"
+                                                Text="{loc:L Zh='刷新', En='Refresh'}" />
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Search Bar -->
+                            <Grid ColumnSpacing="6">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <FontIcon
+                                    Grid.Column="0"
+                                    VerticalAlignment="Center"
+                                    FontSize="12"
+                                    Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                    Glyph="&#xE721;" />
+
+                                <TextBox
+                                    x:Name="TrendingSearchBox"
+                                    Grid.Column="1"
+                                    FontSize="12"
+                                    KeyDown="OnSearchBoxKeyDown"
+                                    PlaceholderText="{loc:L Zh='搜索 HuggingFace 模型 (如 Qwen3 GGUF / DeepSeek 9B / Flux)，回车在线检索...', En='Search HuggingFace models (e.g. Qwen3 GGUF / DeepSeek 9B), press Return...'}"
+                                    TextChanged="OnSearchTextChanged" />
+
+                                <Button
+                                    x:Name="ClearSearchButton"
+                                    Grid.Column="2"
+                                    VerticalAlignment="Center"
+                                    Click="OnClearSearchClick"
+                                    Style="{StaticResource StudioPlainButtonStyle}"
+                                    ToolTipService.ToolTip="{loc:L Zh='清空搜索', En='Clear search'}"
+                                    Visibility="Collapsed">
+                                    <Border
+                                        Width="24"
+                                        Height="24"
+                                        Background="{ThemeResource StudioPrimaryOpacity06Brush}"
+                                        CornerRadius="12">
+                                        <FontIcon
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            FontSize="10"
+                                            Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                            Glyph="&#xE711;" />
+                                    </Border>
+                                </Button>
+
+                                <Button
+                                    Grid.Column="3"
+                                    Padding="12,5"
+                                    Click="OnSearchOnlineClick">
+                                    <TextBlock
+                                        FontSize="11.5"
+                                        FontWeight="SemiBold"
+                                        Text="{loc:L Zh='在线搜索', En='Search HF'}" />
+                                </Button>
+                            </Grid>
+
+                            <!-- Trending Models Container -->
+                            <Border
+                                Height="215"
+                                Background="{ThemeResource StudioInputFillBrush}"
+                                BorderBrush="{ThemeResource StudioCardBorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="9">
+                                <Grid>
+                                    <!-- Empty / Loading State -->
+                                    <StackPanel
+                                        x:Name="TrendingEmptyPanel"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Orientation="Horizontal"
+                                        Spacing="8"
+                                        Visibility="Collapsed">
+                                        <ProgressRing
+                                            x:Name="TrendingEmptySpinner"
+                                            Width="16"
+                                            Height="16"
+                                            IsActive="False"
+                                            Visibility="Collapsed" />
+                                        <TextBlock
+                                            x:Name="TrendingEmptyText"
+                                            MaxWidth="640"
+                                            VerticalAlignment="Center"
+                                            FontSize="11.5"
+                                            Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                            TextAlignment="Center"
+                                            TextWrapping="Wrap" />
+                                    </StackPanel>
+
+                                    <!-- 2-Column Scrollable Grid -->
+                                    <ScrollViewer
+                                        x:Name="TrendingScrollViewer"
+                                        Padding="8"
+                                        VerticalScrollBarVisibility="Auto"
+                                        Visibility="Collapsed">
+                                        <Grid
+                                            x:Name="TrendingModelsGrid"
+                                            ColumnSpacing="8"
+                                            RowSpacing="7">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                        </Grid>
+                                    </ScrollViewer>
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+
+                        <!-- 1. HuggingFace Repo ID or URL -->
+                        <StackPanel Spacing="5">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock
+                                    Grid.Column="0"
+                                    Style="{StaticResource FormLabelStyle}"
+                                    Text="{loc:L Zh='1. HuggingFace 仓库地址 (Repo ID 或 URL)', En='1. HuggingFace Repo ID or URL'}" />
+                                <Button
+                                    x:Name="InspectRepoButton"
+                                    Grid.Column="1"
+                                    Click="OnInspectRepoClick"
+                                    Style="{StaticResource InlineLinkButtonStyle}">
+                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                        <FontIcon
+                                            FontSize="11"
+                                            Foreground="{ThemeResource StudioAccentBlueBrush}"
+                                            Glyph="&#xE8A5;" />
+                                        <TextBlock
+                                            FontSize="11"
+                                            FontWeight="SemiBold"
+                                            Foreground="{ThemeResource StudioAccentBlueBrush}"
+                                            Text="{loc:L Zh='查看模型详情与分片体积', En='Inspect Model Details &amp; Shards'}" />
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
+
+                            <TextBox
+                                x:Name="RepoInputBox"
+                                FontFamily="{StaticResource StudioMonoFont}"
+                                FontSize="12.5"
+                                PlaceholderText="{loc:L Zh='从上方实时热榜点选，或输入任意 Owner/Repo', En='Pick from live trending above or enter any Owner/Repo'}"
+                                TextChanged="OnRepoInputTextChanged" />
+                        </StackPanel>
+
+                        <!-- 2. Include Pattern (Optional) -->
+                        <StackPanel Spacing="5">
+                            <TextBlock
+                                Style="{StaticResource FormLabelStyle}"
+                                Text="{loc:L Zh='2. 文件名 / 通配符过滤 (Include Pattern，可选)', En='2. Filename / Wildcard Filter (Include Pattern, Optional)'}" />
+                            <TextBox
+                                x:Name="IncludePatternBox"
+                                FontFamily="{StaticResource StudioMonoFont}"
+                                FontSize="12"
+                                PlaceholderText="{loc:L Zh='留空默认智能选择；或填 *Q4_K_M*.gguf, *IQ2_XS*.gguf, *.safetensors', En='Blank = auto-select; or *Q4_K_M*.gguf, *IQ2_XS*.gguf, *.safetensors'}"
+                                TextChanged="OnIncludePatternTextChanged" />
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Button Click="OnQuickPatternClick" Content="*Q4_K_M*.gguf" Style="{StaticResource PatternPillButtonStyle}" Tag="*Q4_K_M*.gguf" />
+                                <Button Click="OnQuickPatternClick" Content="*Q8_0*.gguf" Style="{StaticResource PatternPillButtonStyle}" Tag="*Q8_0*.gguf" />
+                                <Button Click="OnQuickPatternClick" Content="*IQ2_XS*.gguf" Style="{StaticResource PatternPillButtonStyle}" Tag="*IQ2_XS*.gguf" />
+                                <Button Click="OnQuickPatternClick" Content="*.safetensors" Style="{StaticResource PatternPillButtonStyle}" Tag="*.safetensors" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- 3. Display Name & 4. Task Modality -->
+                        <Grid ColumnSpacing="12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="260" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" Spacing="5">
+                                <TextBlock
+                                    Style="{StaticResource FormLabelStyle}"
+                                    Text="{loc:L Zh='3. 自定义显示名称 (可选)', En='3. Display Name (Optional)'}" />
+                                <TextBox
+                                    x:Name="DisplayNameBox"
+                                    FontSize="12"
+                                    PlaceholderText="{loc:L Zh='留空自动使用仓库名', En='Leave blank to use repo name'}"
+                                    TextChanged="OnDisplayNameTextChanged" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Spacing="5">
+                                <TextBlock
+                                    Style="{StaticResource FormLabelStyle}"
+                                    Text="{loc:L Zh='4. 模型任务模态', En='4. Task Modality'}" />
+                                <ComboBox
+                                    x:Name="ModalityComboBox"
+                                    HorizontalAlignment="Stretch"
+                                    FontSize="12"
+                                    SelectionChanged="OnModalitySelectionChanged">
+                                    <ComboBoxItem Content="{loc:L Zh='自动识别 (推荐)', En='Auto-detect'}" Tag="auto" />
+                                    <ComboBoxItem Content="{loc:L Zh='对话 / 视觉 / API (LLM/VLM)', En='Chat / Vision / API'}" Tag="llm_vlm" />
+                                    <ComboBoxItem Content="{loc:L Zh='文生图 / 图像编辑 (Image)', En='Image Generation'}" Tag="image" />
+                                    <ComboBoxItem Content="{loc:L Zh='音视频生成 (Video+Audio)', En='Video + Audio'}" Tag="video_audio" />
+                                </ComboBox>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- 5. HuggingFace Token -->
+                        <StackPanel Spacing="5">
+                            <Grid ColumnSpacing="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel
+                                    Grid.Column="0"
+                                    VerticalAlignment="Center"
+                                    Orientation="Horizontal"
+                                    Spacing="5">
+                                    <FontIcon
+                                        FontSize="11.5"
+                                        Foreground="{ThemeResource StudioAccentOrangeBrush}"
+                                        Glyph="&#xE8D7;" />
+                                    <TextBlock
+                                        Style="{StaticResource FormLabelStyle}"
+                                        Text="{loc:L Zh='5. HuggingFace Token (受限/需登录模型必填，自动保存)', En='5. HuggingFace Token (Required for Gated/Private Repos)'}" />
+                                </StackPanel>
+
+                                <Button
+                                    Grid.Column="1"
+                                    Click="OnGetHfTokenClick"
+                                    Style="{StaticResource InlineLinkButtonStyle}">
+                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                        <FontIcon
+                                            FontSize="10.5"
+                                            Foreground="{ThemeResource StudioAccentBlueBrush}"
+                                            Glyph="&#xE8D7;" />
+                                        <TextBlock
+                                            FontSize="10.5"
+                                            FontWeight="SemiBold"
+                                            Foreground="{ThemeResource StudioAccentBlueBrush}"
+                                            Text="{loc:L Zh='获取 HF Token', En='Get HF Token'}" />
+                                    </StackPanel>
+                                </Button>
+
+                                <Button
+                                    Grid.Column="2"
+                                    Click="OnOpenRepoLicenseClick"
+                                    Style="{StaticResource InlineLinkButtonStyle}">
+                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                        <FontIcon
+                                            FontSize="10.5"
+                                            Foreground="{ThemeResource StudioAccentBlueBrush}"
+                                            Glyph="&#xE774;" />
+                                        <TextBlock
+                                            FontSize="10.5"
+                                            FontWeight="SemiBold"
+                                            Foreground="{ThemeResource StudioAccentBlueBrush}"
+                                            Text="{loc:L Zh='打开模型主页同意协议', En='Open Repo &amp; Accept License'}" />
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
+
+                            <PasswordBox
+                                x:Name="HfTokenBox"
+                                FontFamily="{StaticResource StudioMonoFont}"
+                                FontSize="12"
+                                PasswordChanged="OnHfTokenPasswordChanged"
+                                PlaceholderText="hf_xxxxxxxxxxxxxxxxxxxxxxxx" />
+                        </StackPanel>
+
+                        <!-- Error Alert Banner -->
+                        <Border
+                            x:Name="ErrorAlertBorder"
+                            Padding="10,8"
+                            Background="{ThemeResource StudioAccentRedFillBrush}"
+                            CornerRadius="7"
+                            Visibility="Collapsed">
+                            <Grid ColumnSpacing="7">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <FontIcon
+                                    Grid.Column="0"
+                                    VerticalAlignment="Top"
+                                    Margin="0,2,0,0"
+                                    FontSize="13"
+                                    Foreground="{ThemeResource StudioAccentRedBrush}"
+                                    Glyph="&#xE7BA;" />
+                                <TextBlock
+                                    x:Name="ErrorAlertText"
+                                    Grid.Column="1"
+                                    FontSize="11.5"
+                                    FontWeight="Medium"
+                                    Foreground="{ThemeResource StudioAccentRedBrush}"
+                                    TextWrapping="Wrap" />
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <Rectangle Grid.Row="3" Fill="{ThemeResource StudioSplitDividerBrush}" />
+
+                <!-- Bottom Action Footer -->
+                <Grid Grid.Row="4" Padding="18,13" ColumnSpacing="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Button
+                        Grid.Column="0"
+                        Padding="16,7"
+                        Click="OnCancelClick"
+                        Content="{loc:L Zh='取消', En='Cancel'}" />
+
+                    <Button
+                        x:Name="AddModelButton"
+                        Grid.Column="2"
+                        Padding="16,7"
+                        Click="OnAddModelClick">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <ProgressRing
+                                x:Name="RegisterSpinner"
+                                Width="14"
+                                Height="14"
+                                IsActive="False"
+                                Visibility="Collapsed" />
+                            <FontIcon
+                                x:Name="AddModelIcon"
+                                FontSize="13"
+                                Glyph="&#xE710;" />
+                            <TextBlock
+                                FontSize="12.5"
+                                FontWeight="SemiBold"
+                                Text="{loc:L Zh='添加到模型中心', En='Add to Model Center'}" />
+                        </StackPanel>
+                    </Button>
+
+                    <Button
+                        x:Name="AddAndDownloadButton"
+                        Grid.Column="3"
+                        Padding="16,7"
+                        Click="OnAddAndDownloadClick"
+                        Style="{ThemeResource StudioPrimaryButtonStyle}"
+                        Visibility="Collapsed">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <FontIcon FontSize="13" Glyph="&#xEBD3;" />
+                            <TextBlock
+                                FontSize="12.5"
+                                FontWeight="SemiBold"
+                                Text="{loc:L Zh='添加并立即并发拉取权重', En='Add &amp; Download Weights Now'}" />
+                        </StackPanel>
+                    </Button>
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

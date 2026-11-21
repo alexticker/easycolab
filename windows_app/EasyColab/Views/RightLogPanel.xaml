@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="EasyColab.Views.RightLogPanel"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:loc="using:EasyColab.Localization">
+
+    <Grid Padding="12" RowSpacing="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Live Task Summary Strip -->
+        <Border
+            Grid.Row="0"
+            Padding="10"
+            Background="{ThemeResource StudioSidebarCardFillBrush}"
+            BorderBrush="{ThemeResource StudioCardBorderBrush}"
+            BorderThickness="1"
+            CornerRadius="9">
+            <Grid ColumnSpacing="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <FontIcon
+                    x:Name="SummaryIcon"
+                    Grid.Column="0"
+                    Margin="0,1,0,0"
+                    VerticalAlignment="Top"
+                    FontSize="12.5"
+                    FontWeight="SemiBold"
+                    Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                    Glyph="&#xE946;" />
+
+                <StackPanel Grid.Column="1" Spacing="5">
+                    <TextBlock
+                        x:Name="SummaryStatusText"
+                        FontSize="11.5"
+                        FontWeight="Medium"
+                        Foreground="{ThemeResource StudioTextPrimaryBrush}"
+                        MaxLines="3"
+                        TextTrimming="CharacterEllipsis"
+                        TextWrapping="Wrap" />
+
+                    <ProgressBar
+                        x:Name="SummaryProgressBar"
+                        Height="4"
+                        Maximum="1"
+                        Minimum="0"
+                        Visibility="Collapsed" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Full-height Dark Streaming Terminal Viewport -->
+        <Border
+            Grid.Row="1"
+            Background="{ThemeResource StudioLogTerminalFillBrush}"
+            BorderBrush="#14FFFFFF"
+            BorderThickness="1"
+            CornerRadius="10"
+            RequestedTheme="Dark">
+            <Grid>
+                <ScrollViewer
+                    x:Name="LogScrollViewer"
+                    HorizontalScrollBarVisibility="Disabled"
+                    Padding="12"
+                    VerticalScrollBarVisibility="Auto"
+                    ViewChanged="LogScrollViewer_ViewChanged">
+                    <RichTextBlock
+                        x:Name="LogRichText"
+                        FontFamily="{StaticResource StudioMonoFont}"
+                        FontSize="11"
+                        Foreground="#FFDEDEDE"
+                        IsTextSelectionEnabled="True"
+                        LineHeight="17"
+                        TextWrapping="Wrap" />
+                </ScrollViewer>
+
+                <!-- Floating "Jump to Bottom" pill shown when user scrolls up -->
+                <Button
+                    x:Name="JumpBottomButton"
+                    Margin="0,0,12,10"
+                    Padding="8,4"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom"
+                    Background="#CC1E2430"
+                    BorderBrush="#33FFFFFF"
+                    BorderThickness="1"
+                    Click="JumpBottomButton_Click"
+                    CornerRadius="10"
+                    Visibility="Collapsed">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <FontIcon FontSize="10" Foreground="#FF75CCFA" Glyph="&#xE74B;" />
+                        <TextBlock
+                            FontSize="10.5"
+                            FontWeight="SemiBold"
+                            Foreground="#FFE2E8F0"
+                            Text="{loc:L Zh='回到底部', En='Latest'}" />
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

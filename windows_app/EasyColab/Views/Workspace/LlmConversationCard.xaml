@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="EasyColab.Views.Workspace.LlmConversationCard"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:c="using:EasyColab.Controls"
+    xmlns:loc="using:EasyColab.Localization">
+
+    <c:WorkspaceCard x:Name="RootCard" Icon="&#xE8BD;">
+        <c:WorkspaceCard.Trailing>
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button
+                    x:Name="ApiGatewayButton"
+                    Padding="10,4"
+                    Click="ApiGatewayButton_Click"
+                    FontSize="12">
+                    <StackPanel Orientation="Horizontal" Spacing="5">
+                        <FontIcon FontSize="12" Glyph="&#xE774;" />
+                        <TextBlock Text="{loc:L Zh='API 接入配置', En='API Gateway'}" />
+                    </StackPanel>
+                </Button>
+                <Button
+                    x:Name="ClearChatButton"
+                    Padding="10,4"
+                    Click="ClearChatButton_Click"
+                    Content="{loc:L Zh='清空对话', En='Clear Chat'}"
+                    FontSize="12" />
+            </StackPanel>
+        </c:WorkspaceCard.Trailing>
+
+        <Grid>
+            <!-- Empty state (Swift: minHeight 240) -->
+            <StackPanel
+                x:Name="EmptyStatePanel"
+                MinHeight="240"
+                Padding="16"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Spacing="8">
+                <FontIcon
+                    HorizontalAlignment="Center"
+                    FontSize="30"
+                    Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                    Glyph="&#xE99A;"
+                    Opacity="0.6" />
+                <TextBlock
+                    x:Name="EmptyHintText"
+                    HorizontalAlignment="Center"
+                    FontSize="12.5"
+                    Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                    TextAlignment="Center"
+                    TextWrapping="Wrap" />
+            </StackPanel>
+
+            <!-- Streaming conversation turns -->
+            <ScrollViewer
+                x:Name="ChatScrollViewer"
+                MaxHeight="560"
+                HorizontalScrollBarVisibility="Disabled"
+                VerticalScrollBarVisibility="Auto"
+                Visibility="Collapsed">
+                <StackPanel
+                    x:Name="TurnsHost"
+                    Padding="0,0,4,0"
+                    Spacing="12" />
+            </ScrollViewer>
+        </Grid>
+    </c:WorkspaceCard>
+</UserControl>

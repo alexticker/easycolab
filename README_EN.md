@@ -2,7 +2,7 @@
 
 [简体中文](./README.md) | **English**
 
-**EasyColab** is a native Multimodal AI Studio built for **macOS, Windows, Linux, iOS / iPadOS, and Android**, powered by Google Colab high-VRAM cloud GPUs (macOS native SwiftUI client + Windows / Linux PySide6/Qt6 desktop client + iOS/iPadOS pure SwiftUI client + Android pure Kotlin Jetpack Compose client + cloud multi-model acceleration engine).
+**EasyColab** is a native Multimodal AI Studio built for **macOS, Windows, iOS / iPadOS, and Android**, powered by Google Colab high-VRAM cloud GPUs (macOS native SwiftUI client + Windows native WinUI 3 / .NET 10 desktop client + iOS/iPadOS pure SwiftUI client + Android pure Kotlin Jetpack Compose client + cloud multi-model acceleration engine).
 
 Optimized out of the box for **Google Colab G4 (`NVIDIA RTX PRO 6000 Blackwell` · `96 GB` VRAM + `176 GB` System RAM)** as well as `H100 / A100 / L4` runtimes, EasyColab supports headless one-click runtime wake & deployment, persistent model caching on Google Drive, multi-model VRAM co-residency, real-time spline telemetry charts, instant Chinese/English UI switching, and automatic idle runtime release to save Compute Units.
 
@@ -20,8 +20,8 @@ Headless Drive mounting can still copy a Google refresh token with Colab and Clo
 
 ## Key Features
 
-- **Cross-Platform Native Studio + Bilingual UI Toggle + Interactive Onboarding (1:1 Parity Across macOS, Windows & Linux)**
-  - **macOS Client** is crafted natively with SwiftUI + AppKit; **Windows & Linux Clients** are built with PySide6 (Qt6 + FFmpeg multimedia pipeline) featuring high-DPI scaling. All include a **4-step interactive onboarding wizard** on first launch with zero-config bridge initialization.
+- **Cross-Platform Native Studio + Bilingual UI Toggle + Interactive Onboarding (1:1 Parity Across macOS & Windows)**
+  - **macOS Client** is crafted natively with SwiftUI + AppKit; **Windows Client** is built natively with **WinUI 3 + .NET 10** (Windows App SDK, high-DPI and light/dark theme adaptive). Both include a **4-step interactive onboarding wizard** on first launch with zero-config bridge initialization.
   - Built-in **one-click Chinese / English (`中文 / EN`) live UI toggle** (defaults to Chinese), persisting language preferences automatically without restarting the app.
   - Real-time smooth Catmull-Rom spline telemetry charts for cloud **GPU VRAM / System RAM / Disk Space** (supporting both split and combined overlay modes), paired with official **Compute Unit (CU) balance** and hourly burn-rate tracking.
   - Built-in **30-minute idle auto-sleep watchdog** and one-click **"Release All Instances"** to prevent forgotten runtimes from draining your CU quota.
@@ -37,7 +37,7 @@ Headless Drive mounting can still copy a Google refresh token with Colab and Clo
      - Supports up to `256K` context length, deep chain-of-thought reasoning, and multimodal image analysis / prompt reverse-engineering.
      - Built-in public API gateway compatible with both **OpenAI (`/v1/chat/completions`)** and **Anthropic (`/v1/messages`)** (with Bearer / `x-api-key` authentication), ready to plug directly into **Claude Code**, **Cursor**, and custom agent workflows.
   4. **`Qwen-Image-2.1` & `Z-Image-Turbo` · 2K Poster Generation & Multi-Image Instruction Editing**
-     - High-fidelity bilingual typography rendering, natural-language multi-image editing, and 8-step ultra-fast photorealistic generation. All generated MP4 videos and PNG images are automatically pulled back to your local machine (macOS: `~/Movies/EasyColab`, Windows: `%USERPROFILE%\Videos\EasyColab`, Linux: `~/Videos/EasyColab`).
+     - High-fidelity bilingual typography rendering, natural-language multi-image editing, and 8-step ultra-fast photorealistic generation. All generated MP4 videos and PNG images are automatically pulled back to your local machine (macOS: `~/Movies/EasyColab`, Windows: `%USERPROFILE%\Videos\EasyColab`).
 
 ---
 
@@ -46,8 +46,7 @@ Headless Drive mounting can still copy a Google refresh token with Colab and Clo
 ### System Requirements
 - **Operating System**:
   - **macOS**: macOS 13.0 (Ventura) or later (Apple Silicon / macOS Sonoma & Sequoia recommended)
-  - **Windows**: Windows 10 (1903+) or Windows 11 64-bit (x64)
-  - **Linux**: Modern 64-bit desktop distributions (Ubuntu 22.04+ / Debian 12+ / Arch Linux / Fedora, with Python 3.10+ and FFmpeg)
+  - **Windows**: Windows 10 (1903+) or Windows 11 64-bit (x64 / ARM64)
   - **iOS / iPadOS**: iOS 16.0 or later (build & sign locally from open-source `ios_app/` via Xcode, or sideload `.ipa` via AltStore / SideStore / Sideloadly / TrollStore)
   - **Android**: Android 8.0 (API 26) or later (direct signed `.apk` via GitHub Releases, or build from open-source `android_app/`)
 - **Cloud Account**: A Google account subscribed to **Google Colab Pro / Pro+ / Google AI Ultra** with available Compute Units (CU). Free-tier users should follow the *"Run via Official Google Colab Web UI"* section below.
@@ -77,51 +76,34 @@ xattr -cr /Applications/EasyColab.app
 
 ---
 
-### Windows Client
+### Windows Client (Native WinUI 3)
 
-#### Option 1: Download Portable `.zip` (Zero Python Dependency, Recommended)
-1. Download `EasyColab-Windows-x64.zip` from GitHub Releases (or from repository **Actions -> Build EasyColab Windows App** artifacts).
-2. Extract to any folder and double-click `EasyColab\EasyColab.exe` (bundles an embedded Python runtime, Qt6 UI libraries, FFmpeg audio/video codecs, and the `colab_bridge` cloud launcher — no system Python required).
+#### Option 1: Download Portable `.zip` (Zero Dependencies, Recommended)
+1. Download `EasyColab-Windows-x64.zip` (or `arm64`) from GitHub Releases (or from repository **Actions -> Build EasyColab Windows App** artifacts).
+2. Extract to any folder and double-click `EasyColab\EasyColab.exe` (self-contained .NET 10 + Windows App SDK native UI with an embedded minimal Python runtime strictly for `colab_bridge.py` — no system .NET or Python required).
 3. If Windows SmartScreen displays *"Windows protected your PC"*, click **More info -> Run anyway**.
 
 #### Option 2: Build Standalone `.exe` Locally on Windows
-With 64-bit Python 3.10–3.13 installed, run the one-click build script from the repository root to generate `dist\EasyColab\EasyColab.exe` and `EasyColab-Windows-x64.zip`:
+Requires [.NET 10 SDK](https://dotnet.microsoft.com/download) and Python 3.10+ (used only to download `colab_bridge` dependency wheels). Run the one-click build script from the repository root to generate `dist\EasyColab\EasyColab.exe` and `EasyColab-Windows-x64.zip`:
 
 ```bat
 REM Double-click or run in CMD:
 windows_app\build_windows_app.bat
 ```
 
-Or in PowerShell:
+Or in PowerShell 7:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\windows_app\build_windows_app.ps1
+pwsh -File .\windows_app\build_windows_app.ps1 -Arch x64
 ```
 
-#### Option 3: Run Directly from Source (Windows / Linux / macOS Cross-Platform Preview)
+#### Option 3: Run Directly from Source
 
-```bash
-python -m venv .venv
-# Windows:       .venv\Scripts\activate
-# Linux / macOS: source .venv/bin/activate
-pip install -r windows_app/requirements-windows.txt
-python windows_app/easycolab_win.py
+```powershell
+cd windows_app\EasyColab
+dotnet build -c Debug -p:Platform=x64
+.\bin\x64\Debug\net10.0-windows10.0.22621.0\win-x64\EasyColab.exe
 ```
-
----
-
-### Linux Client
-
-Run `run_linux.sh` from the repository root (automatically creates an isolated `.venv` and installs PySide6 and bridge dependencies on first launch):
-
-```bash
-git clone https://github.com/wy51ai/easycolab.git
-cd easycolab
-./run_linux.sh
-```
-
-- Local settings are saved at `~/.config/EasyColab/settings.json`, and generated media is saved to `~/Videos/EasyColab` (respecting `XDG_VIDEOS_DIR` when set).
-- Automatically detects `HTTP_PROXY` / `HTTPS_PROXY` environment variables as well as GNOME system proxy settings (`gsettings`).
 
 ---
 

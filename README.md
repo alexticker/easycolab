@@ -2,7 +2,7 @@
 
 **简体中文** | [English](./README_EN.md)
 
-**EasyColab** 是一款专为 **macOS、Windows、Linux、iOS / iPadOS 与 Android** 原生打造的 Google Colab 云端大显存多模态 AI 创作工作台（macOS SwiftUI 原生客户端 + Windows / Linux PySide6/Qt6 桌面客户端 + iOS/iPadOS 纯 SwiftUI 原生客户端 + Android 纯 Kotlin Jetpack Compose 原生客户端 + 云端多模型加速引擎）。
+**EasyColab** 是一款专为 **macOS、Windows、iOS / iPadOS 与 Android** 原生打造的 Google Colab 云端大显存多模态 AI 创作工作台（macOS SwiftUI 原生客户端 + Windows WinUI 3 / .NET 10 原生客户端 + iOS/iPadOS 纯 SwiftUI 原生客户端 + Android 纯 Kotlin Jetpack Compose 原生客户端 + 云端多模型加速引擎）。
 
 默认适配 **Google Colab G4（NVIDIA RTX PRO 6000 Blackwell · `96 GB` 显存 + `176 GB` 系统内存）** 以及 `H100 / A100 / L4` 实例，支持免开网页一键唤醒部署、Google Drive 云盘权重永久复用、多模型显存共驻、实时算力折线图监控、中英文双语界面一键切换与闲置自动释放省额度。
 
@@ -20,8 +20,8 @@ Drive 无浏览器挂载仍可能将带有 Colab 和 Cloud Platform 授权的 Go
 
 ## 核心特性
 
-- **全平台桌面级创作体验 + 中英文双语切换 + 新手交互引导（macOS / Windows / Linux 1:1 全功能对齐）**
-  - **macOS 端**采用纯原生 SwiftUI + AppKit 构建，**Windows 与 Linux 端**采用 PySide6 (Qt6 + FFmpeg 多媒体管线) 构建并适配高分屏缩放；首次启动均自带 **4 步交互式新手引导**，零配置自动初始化连接组件。
+- **全平台原生桌面创作体验 + 中英文双语切换 + 新手交互引导（macOS / Windows 1:1 全功能对齐）**
+  - **macOS 端**采用纯原生 SwiftUI + AppKit 构建，**Windows 端**采用纯原生 **WinUI 3 + .NET 10**（Windows App SDK，高分屏与深浅主题自适应）构建；首次启动均自带 **4 步交互式新手引导**，零配置自动初始化连接组件。
   - 支持 **中英文（简体中文 / English）界面实时一键切换**（默认显示中文），状态与偏好自动记忆，无需重启应用。
   - 实时绘制云端 **GPU 显存 / 系统内存 / 磁盘空间** 平滑曲线走势图（支持分项与同屏叠加模式），同步显示官方真实剩余 **CU 计算单元** 与每小时消耗速率。
   - 内置 **30 分钟闲置自动休眠看门狗** 与一键「断开并释放实例」，杜绝忘记关机空耗算力额度。
@@ -37,7 +37,7 @@ Drive 无浏览器挂载仍可能将带有 Colab 和 Cloud Platform 授权的 Go
      - 支持最高 `256K` 上下文、长思维链推理、多模态看图反推提示词。
      - 内置兼容 **OpenAI (`/v1/chat/completions`)** 与 **Anthropic (`/v1/messages`)** 的公网 API 网关（支持 Bearer / `x-api-key` 鉴权），可直接接入 **Claude Code**、**Cursor** 等开发工具。
   4. **`Qwen-Image-2.1` & `Z-Image-Turbo` · 2K 海报生图与多图指令修图**
-     - 支持高质感中英文排版直出、双图自然语言指令修图与 8 步极速出图；所有生成的 MP4 / PNG 自动回传至本地目录（macOS: `~/Movies/EasyColab`，Windows: `%USERPROFILE%\Videos\EasyColab`，Linux: `~/Videos/EasyColab`）。
+     - 支持高质感中英文排版直出、双图自然语言指令修图与 8 步极速出图；所有生成的 MP4 / PNG 自动回传至本地目录（macOS: `~/Movies/EasyColab`，Windows: `%USERPROFILE%\Videos\EasyColab`）。
 
 ---
 
@@ -46,8 +46,7 @@ Drive 无浏览器挂载仍可能将带有 Colab 和 Cloud Platform 授权的 Go
 ### 系统要求
 - **操作系统**：
   - **macOS**：macOS 13.0 (Ventura) 或更高版本（推荐 Apple Silicon / macOS Sonoma & Sequoia）
-  - **Windows**：Windows 10 (1903+) 或 Windows 11 64 位 (x64)
-  - **Linux**：主流 64 位桌面发行版（Ubuntu 22.04+ / Debian 12+ / Arch Linux / Fedora 等，需 Python 3.10+ 与 FFmpeg）
+  - **Windows**：Windows 10 (1903+) 或 Windows 11 64 位（x64 / ARM64）
   - **iOS / iPadOS**：iOS 16.0 或更高版本（支持 Mac 本地源码真机签名安装或通过 AltStore / SideStore / Sideloadly / TrollStore 侧载 `.ipa`）
   - **Android**：Android 8.0 (API 26) 或更高版本（支持从 GitHub Releases 下载签名 `.apk` 直接安装，或从 `android_app/` 源码一键编译）
 - **云端账号**：开通了 **Google Colab Pro / Pro+ / Google AI Ultra**（拥有可用 CU 计算单元）的 Google 账号；免费版用户请使用下方「Google Colab 官方网页端运行 `.ipynb`」。
@@ -77,58 +76,34 @@ xattr -cr /Applications/EasyColab.app
 
 ---
 
-### Windows 客户端
+### Windows 客户端（WinUI 3 原生）
 
-#### 方式一：下载免安装绿色版 `.zip`（零 Python 依赖，推荐）
-1. 从 GitHub Releases（或仓库 **Actions -> Build EasyColab Windows App** 构建产物）下载 `EasyColab-Windows-x64.zip`。
-2. 解压到任意目录后，直接双击运行 `EasyColab\EasyColab.exe` 即可使用（已内置 Python 运行时、Qt6 界面库、FFmpeg 音视频解码器与 `colab_bridge` 云端唤醒组件，无需在电脑上安装 Python）。
+#### 方式一：下载免安装绿色版 `.zip`（零依赖，推荐）
+1. 从 GitHub Releases（或仓库 **Actions -> Build EasyColab Windows App** 构建产物）下载 `EasyColab-Windows-x64.zip`（或 `arm64`）。
+2. 解压到任意目录后，直接双击运行 `EasyColab\EasyColab.exe` 即可使用（自包含 .NET 10 + Windows App SDK 原生界面，并内嵌精简 Python 运行时专用于 `colab_bridge.py` 云端唤醒，无需在电脑上安装 .NET 或 Python）。
 3. 如遇 Windows SmartScreen 提示 *“Windows 已保护你的电脑”*，点击 **「更多信息」 -> 「仍要运行」** 即可。
 
-#### 方式二：Windows 本地一键打包独立 `.exe`
-若本机已安装 Python 3.10～3.13（64 位），在仓库根目录可直接一键创建隔离虚拟环境并编译生成 `dist\EasyColab\EasyColab.exe` 与 `EasyColab-Windows-x64.zip`：
+#### 方式二：Windows 本地一键编译打包
+需要安装 [.NET 10 SDK](https://dotnet.microsoft.com/download) 与 Python 3.10+（仅用于下载 `colab_bridge` 依赖 wheel），在仓库根目录一键编译生成 `dist\EasyColab\EasyColab.exe` 与 `EasyColab-Windows-x64.zip`：
 
 ```bat
 REM 双击或在 CMD 中运行：
 windows_app\build_windows_app.bat
 ```
 
-或使用 PowerShell：
+或使用 PowerShell 7：
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\windows_app\build_windows_app.ps1
+pwsh -File .\windows_app\build_windows_app.ps1 -Arch x64
 ```
 
-#### 方式三：在 macOS 上直接交叉打包 Windows 独立 `.exe`
-若当前在 macOS 开发机上（已安装 `brew install mingw-w64`），无需 Windows 虚拟机即可直接交叉编译原生 Win32 GUI 启动器并组装完整的 `EasyColab-Windows-x64.zip`：
+#### 方式三：源码开发模式直接运行
 
-```bash
-python3 windows_app/build_windows_from_mac.py
+```powershell
+cd windows_app\EasyColab
+dotnet build -c Debug -p:Platform=x64
+.\bin\x64\Debug\net10.0-windows10.0.22621.0\win-x64\EasyColab.exe
 ```
-
-#### 方式四：源码开发模式直接运行（Windows / Linux / macOS 通用预览）
-
-```bash
-python -m venv .venv
-# Windows:       .venv\Scripts\activate
-# Linux / macOS: source .venv/bin/activate
-pip install -r windows_app/requirements-windows.txt
-python windows_app/easycolab_win.py
-```
-
----
-
-### Linux 客户端
-
-只需一键执行仓库根目录下的 `run_linux.sh`（首次运行会自动创建 `.venv` 隔离环境并安装 PySide6 与 Colab 桥接依赖）：
-
-```bash
-git clone https://github.com/wy51ai/easycolab.git
-cd easycolab
-./run_linux.sh
-```
-
-- 本地配置自动保存在 `~/.config/EasyColab/settings.json`，生成的视频与图片默认保存在 `~/Videos/EasyColab`（优先遵循 `XDG_VIDEOS_DIR`）。
-- 支持自动读取环境变量代理（`HTTP_PROXY` / `HTTPS_PROXY`）以及 GNOME 系统网络代理（`gsettings`）。
 
 ---
 

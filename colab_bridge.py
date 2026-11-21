@@ -90,7 +90,8 @@ def _sync_macos_system_proxies_to_env():
 _sync_macos_system_proxies_to_env()
 os.environ.setdefault("COLAB_CLI_REQUEST_TIMEOUT", "75")
 
-from colab_cli.auth import PUBLIC_SCOPES, TOKEN_CONFIG_PATH, REMOTE_REDIRECT_URI
+import colab_cli.auth as _colab_auth
+from colab_cli.auth import PUBLIC_SCOPES, REMOTE_REDIRECT_URI
 from colab_cli.common import state
 from colab_cli.client import (
     Accelerator,
@@ -106,6 +107,96 @@ from colab_cli.state import SessionState
 from colab_cli.runtime import ColabRuntime
 from colab_cli.contents import ContentsClient
 
+TOKEN_CONFIG_PATH = getattr(
+    _colab_auth,
+    "TOKEN_CONFIG_PATH",
+    getattr(_colab_auth, "LEGACY_TOKEN_PATH", os.path.expanduser("~/.config/colab-cli/token.json")),
+)
+_KEYRING_SERVICE_NAME = getattr(_colab_auth, "KEYRING_SERVICE_NAME", "google-colab-cli")
+_KEYRING_USERNAME = getattr(_colab_auth, "KEYRING_USERNAME", "oauth_token")
+_HAS_KEYRING_BACKEND = hasattr(_colab_auth, "_get_token_from_keyring") and hasattr(_colab_auth, "_save_token_to_keyring")
+
+
+def _read_saved_token_json() -> str | None:
+    """读取 google-colab-cli 保存的 OAuth token（兼容新版 OS keyring 与旧版 token.json）。"""
+    if _HAS_KEYRING_BACKEND:
+        try:
+            tok = _colab_auth._get_token_from_keyring()
+            if tok:
+                return tok
+        except Exception:
+            pass
+    else:
+        try:
+            import keyring  # type: ignore
+            tok = keyring.get_password(_KEYRING_SERVICE_NAME, _KEYRING_USERNAME)
+            if tok:
+                return tok
+        except Exception:
+            pass
+
+    if TOKEN_CONFIG_PATH and os.path.exists(TOKEN_CONFIG_PATH):
+        try:
+            with open(TOKEN_CONFIG_PATH, "r", encoding="utf-8") as f:
+                return f.read()
+        except Exception:
+            pass
+    return None
+
+
+def _write_saved_token_json(token_json: str) -> None:
+    """保存 OAuth token（新版优先写入 OS keyring 并清理旧明文文件，旧版回退至 token.json）。"""
+    saved_to_keyring = False
+    if _HAS_KEYRING_BACKEND:
+        try:
+            _colab_auth._save_token_to_keyring(token_json)
+            saved_to_keyring = True
+        except Exception:
+            saved_to_keyring = False
+
+    if saved_to_keyring:
+        if TOKEN_CONFIG_PATH and os.path.exists(TOKEN_CONFIG_PATH):
+            try:
+                os.remove(TOKEN_CONFIG_PATH)
+            except Exception:
+                pass
+        return
+
+    os.makedirs(os.path.dirname(TOKEN_CONFIG_PATH), exist_ok=True)
+    with open(TOKEN_CONFIG_PATH, "w", encoding="utf-8") as f:
+        f.write(token_json)
+
+
+def _delete_saved_token() -> None:
+    """删除 OS keyring 与旧明文文件中的 OAuth token。"""
+    try:
+        import keyring  # type: ignore
+        keyring.delete_password(_KEYRING_SERVICE_NAME, _KEYRING_USERNAME)
+    except Exception:
+        pass
+    if TOKEN_CONFIG_PATH and os.path.exists(TOKEN_CONFIG_PATH):
+        try:
+            os.remove(TOKEN_CONFIG_PATH)
+        except Exception:
+            pass
+
+
+def _load_and_refresh_credentials() -> Credentials | None:
+    token_json = _read_saved_token_json()
+    if not token_json:
+        return None
+    try:
+        creds = Credentials.from_authorized_user_info(json.loads(token_json), PUBLIC_SCOPES)
+        if creds and creds.valid:
+            return creds
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+            _write_saved_token_json(creds.to_json())
+            return creds
+    except Exception:
+        return None
+    return None
+
 
 def _load_client_config() -> dict:
     cfg_path = os.path.expanduser("~/.colab-cli-oauth-config.json")
@@ -117,20 +208,7 @@ def _load_client_config() -> dict:
 
 
 def _has_valid_token() -> bool:
-    if not os.path.exists(TOKEN_CONFIG_PATH):
-        return False
-    try:
-        creds = Credentials.from_authorized_user_file(TOKEN_CONFIG_PATH, PUBLIC_SCOPES)
-        if creds and creds.valid:
-            return True
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-            with open(TOKEN_CONFIG_PATH, "w", encoding="utf-8") as f:
-                f.write(creds.to_json())
-            return True
-    except Exception:
-        return False
-    return False
+    return _load_and_refresh_credentials() is not None
 
 
 PKCE_VERIFIER_PATH = os.path.expanduser("~/.config/colab-cli/pkce_verifier.txt")
@@ -152,14 +230,10 @@ def _clear_local_session_store():
 
 def _get_account_email() -> str:
     """获取当前绑定 Google 账号邮箱（按 refresh_token 指纹本地缓存，避免重复请求）"""
-    if not os.path.exists(TOKEN_CONFIG_PATH):
+    creds = _load_and_refresh_credentials()
+    if not creds:
         return ""
     try:
-        creds = Credentials.from_authorized_user_file(TOKEN_CONFIG_PATH, PUBLIC_SCOPES)
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-            with open(TOKEN_CONFIG_PATH, "w", encoding="utf-8") as f:
-                f.write(creds.to_json())
         tok_fp = (creds.refresh_token or creds.token or "")[-20:]
         if tok_fp and os.path.exists(ACCOUNT_PROFILE_CACHE_PATH):
             try:
@@ -217,9 +291,7 @@ def cmd_auth_code(code: str):
                     os.remove(p)
                 except Exception:
                     pass
-        os.makedirs(os.path.dirname(TOKEN_CONFIG_PATH), exist_ok=True)
-        with open(TOKEN_CONFIG_PATH, "w", encoding="utf-8") as f:
-            f.write(creds.to_json())
+        _write_saved_token_json(creds.to_json())
         return cmd_auth_status()
     except Exception as e:
         print(json.dumps({"ok": False, "logged_in": False, "error": str(e)}))
@@ -227,7 +299,8 @@ def cmd_auth_code(code: str):
 
 def cmd_auth_logout():
     _clear_local_session_store()
-    for p in (TOKEN_CONFIG_PATH, PKCE_VERIFIER_PATH, ACCOUNT_PROFILE_CACHE_PATH):
+    _delete_saved_token()
+    for p in (PKCE_VERIFIER_PATH, ACCOUNT_PROFILE_CACHE_PATH):
         if os.path.exists(p):
             try:
                 os.remove(p)
@@ -314,21 +387,22 @@ def _build_rclone_drive_conf(token_path: str = TOKEN_CONFIG_PATH) -> str:
     drive.googleapis.com 会被 Google 直接返回 403 SERVICE_DISABLED，此时跳过 rclone 配置，
     生成的成片由客户端自动拉取保存至本地电脑。
     """
-    if not os.path.exists(token_path):
-        return ""
     try:
-        with open(token_path, "r", encoding="utf-8") as rf:
-            pre_raw = json.load(rf)
+        raw_text = _read_saved_token_json()
+        if not raw_text and token_path and os.path.exists(token_path):
+            with open(token_path, "r", encoding="utf-8") as rf:
+                raw_text = rf.read()
+        if not raw_text:
+            return ""
+        pre_raw = json.loads(raw_text)
         pre_cid = str(pre_raw.get("client_id") or "").strip()
         pre_qp = str(pre_raw.get("quota_project_id") or "").strip()
         if pre_cid.startswith(ADC_PUBLIC_CLIENT_PREFIX) and not pre_qp:
             return ""
 
-        creds = Credentials.from_authorized_user_file(token_path, PUBLIC_SCOPES)
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-            with open(token_path, "w", encoding="utf-8") as f:
-                f.write(creds.to_json())
+        creds = _load_and_refresh_credentials()
+        if not creds:
+            return ""
         raw = json.loads(creds.to_json())
         client_id = str(raw.get("client_id") or "").strip()
         quota_project = str(raw.get("quota_project_id") or "").strip()

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="EasyColab.Views.Workspace.MediaHistoryCard"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:c="using:EasyColab.Controls"
+    xmlns:loc="using:EasyColab.Localization">
+
+    <c:WorkspaceCard
+        x:Name="RootCard"
+        Title="{loc:L Zh='本地历史', En='Local History'}"
+        Icon="&#xE81C;">
+        <c:WorkspaceCard.Trailing>
+            <Button
+                x:Name="RefreshButton"
+                Padding="5"
+                Click="RefreshButton_Click"
+                Style="{StaticResource StudioPlainButtonStyle}"
+                ToolTipService.ToolTip="{loc:L Zh='刷新本地列表', En='Refresh local media list'}">
+                <FontIcon
+                    FontSize="12.5"
+                    Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                    Glyph="&#xE72C;" />
+            </Button>
+        </c:WorkspaceCard.Trailing>
+
+        <Grid>
+            <!-- Empty state (Swift: minHeight 290) -->
+            <TextBlock
+                x:Name="EmptyStateText"
+                MinHeight="290"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                FontSize="11.5"
+                Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                Text="{loc:L Zh='暂无本地生成记录', En='No local outputs yet'}"
+                TextAlignment="Center" />
+
+            <!-- History list (Swift: height 330) -->
+            <ScrollViewer
+                x:Name="HistoryScrollViewer"
+                Height="330"
+                HorizontalScrollBarVisibility="Disabled"
+                VerticalScrollBarVisibility="Auto"
+                Visibility="Collapsed">
+                <StackPanel
+                    x:Name="ItemsHost"
+                    Padding="0,0,2,0"
+                    Spacing="3" />
+            </ScrollViewer>
+        </Grid>
+    </c:WorkspaceCard>
+</UserControl>

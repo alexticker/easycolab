@@ -1,0 +1,519 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="EasyColab.Views.Workspace.ApiGatewayView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:c="using:EasyColab.Controls"
+    xmlns:loc="using:EasyColab.Localization">
+
+    <UserControl.Resources>
+        <Style x:Key="ApiCompactButtonStyle" TargetType="Button">
+            <Setter Property="Padding" Value="9,4" />
+            <Setter Property="MinHeight" Value="28" />
+            <Setter Property="FontSize" Value="11.5" />
+            <Setter Property="CornerRadius" Value="6" />
+        </Style>
+
+        <Style x:Key="ApiMiniCopyButtonStyle" TargetType="Button">
+            <Setter Property="Padding" Value="7,2" />
+            <Setter Property="MinHeight" Value="22" />
+            <Setter Property="MinWidth" Value="0" />
+            <Setter Property="FontSize" Value="10.5" />
+            <Setter Property="CornerRadius" Value="5" />
+        </Style>
+
+        <Style x:Key="ApiSegmentedTabButtonStyle" TargetType="Button">
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="Padding" Value="8,4" />
+            <Setter Property="MinHeight" Value="26" />
+            <Setter Property="FontSize" Value="11.5" />
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="CornerRadius" Value="5" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+    </UserControl.Resources>
+
+    <StackPanel Spacing="16">
+
+        <!-- 1. 网关安全鉴权与运行状态卡片 -->
+        <c:WorkspaceCard
+            Icon="&#xE72E;"
+            Title="{loc:L Zh='网关安全鉴权与运行状态', En='Gateway Authentication &amp; Status'}"
+            Subtitle="{loc:L Zh='公网隧道开启期间，建议保持密钥鉴权开启以保护你的 Colab 算力单元 (CU)', En='Keep API Key authentication enabled while the public tunnel is live to protect your Colab Compute Units (CU)'}">
+            <c:WorkspaceCard.Trailing>
+                <TextBlock
+                    x:Name="ApiRequestCountText"
+                    FontFamily="{StaticResource StudioMonoFont}"
+                    FontSize="11.5"
+                    FontWeight="SemiBold"
+                    Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                    VerticalAlignment="Center" />
+            </c:WorkspaceCard.Trailing>
+
+            <StackPanel Spacing="10">
+                <!-- Auth status & VRAM tip row -->
+                <Grid ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        FontSize="12.5"
+                        FontWeight="Medium"
+                        Foreground="{ThemeResource StudioTextPrimaryBrush}"
+                        VerticalAlignment="Center"
+                        Text="{loc:L Zh='API Key 鉴权已启用', En='API key authentication is required'}" />
+
+                    <TextBlock
+                        x:Name="VramStatusTipText"
+                        Grid.Column="1"
+                        FontSize="11.5"
+                        HorizontalAlignment="Right"
+                        HorizontalTextAlignment="Right"
+                        TextWrapping="Wrap"
+                        VerticalAlignment="Center"
+                        Visibility="Collapsed" />
+                </Grid>
+
+                <!-- API Key input & action bar -->
+                <Grid x:Name="ApiKeyRow" ColumnSpacing="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        FontSize="11.5"
+                        Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                        VerticalAlignment="Center"
+                        Text="{loc:L Zh='访问密钥', En='API Key'}" />
+
+                    <Grid Grid.Column="1">
+                        <TextBox
+                            x:Name="ApiKeyTextBox"
+                            FontFamily="{StaticResource StudioMonoFont}"
+                            FontSize="12"
+                            PlaceholderText="API Key"
+                            TextChanged="OnApiKeyTextChanged"
+                            KeyDown="OnApiKeyInputKeyDown" />
+                        <PasswordBox
+                            x:Name="ApiKeyPasswordBox"
+                            FontFamily="{StaticResource StudioMonoFont}"
+                            FontSize="12"
+                            PasswordRevealMode="Hidden"
+                            PlaceholderText="API Key"
+                            Visibility="Collapsed"
+                            PasswordChanged="OnApiKeyPasswordChanged"
+                            KeyDown="OnApiKeyInputKeyDown" />
+                    </Grid>
+
+                    <Button
+                        x:Name="ToggleRevealKeyButton"
+                        Grid.Column="2"
+                        Style="{StaticResource ApiCompactButtonStyle}"
+                        Padding="8,4"
+                        Click="OnToggleRevealKeyClick">
+                        <FontIcon x:Name="ToggleRevealKeyIcon" FontSize="12.5" Glyph="&#xED1A;" />
+                    </Button>
+
+                    <Button
+                        x:Name="SyncApiKeyButton"
+                        Grid.Column="3"
+                        Style="{StaticResource ApiCompactButtonStyle}"
+                        Content="{loc:L Zh='同步到云端', En='Sync to Cloud'}"
+                        Click="OnSyncApiKeyClick" />
+
+                    <Button
+                        Grid.Column="4"
+                        Style="{StaticResource ApiCompactButtonStyle}"
+                        Content="{loc:L Zh='重新生成', En='Regenerate'}"
+                        Click="OnRegenerateApiKeyClick" />
+
+                    <Button
+                        Grid.Column="5"
+                        Style="{StaticResource StudioPrimaryButtonStyle}"
+                        Padding="10,4"
+                        MinHeight="28"
+                        FontSize="11.5"
+                        CornerRadius="6"
+                        Content="{loc:L Zh='复制密钥', En='Copy Key'}"
+                        Click="OnCopyApiKeyClick" />
+                </Grid>
+            </StackPanel>
+        </c:WorkspaceCard>
+
+        <!-- 2. OpenAI & Anthropic 双协议卡片 -->
+        <Grid ColumnSpacing="16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Left: OpenAI 兼容协议 -->
+            <c:WorkspaceCard
+                Grid.Column="0"
+                Icon="&#xE945;"
+                Title="{loc:L Zh='OpenAI 兼容协议', En='OpenAI-Compatible Protocol (`/v1`)'}"
+                Subtitle="{loc:L Zh='兼容 OpenAI SDK、Cursor、Cherry Studio、Chatbox 等客户端', En='Compatible with OpenAI SDK, Cursor, Cherry Studio, Chatbox &amp; more'}">
+                <StackPanel Spacing="10">
+                    <!-- Endpoint rows -->
+                    <StackPanel Spacing="4">
+                        <!-- Row 1: Base URL -->
+                        <Grid ColumnSpacing="8" Padding="0,2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="72" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock
+                                Grid.Column="0"
+                                FontSize="11.5"
+                                Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                VerticalAlignment="Center"
+                                Text="Base URL" />
+                            <TextBlock
+                                x:Name="OpenAiBaseUrlText"
+                                Grid.Column="1"
+                                FontFamily="{StaticResource StudioMonoFont}"
+                                FontSize="11.5"
+                                Foreground="{ThemeResource StudioTextPrimaryBrush}"
+                                IsTextSelectionEnabled="True"
+                                MaxLines="1"
+                                TextTrimming="CharacterEllipsis"
+                                VerticalAlignment="Center" />
+                            <Button
+                                Grid.Column="2"
+                                Style="{StaticResource ApiMiniCopyButtonStyle}"
+                                Content="{loc:L Zh='复制', En='Copy'}"
+                                Click="OnCopyOpenAiBaseUrlClick" />
+                        </Grid>
+
+                        <!-- Row 2: Chat URL -->
+                        <Grid ColumnSpacing="8" Padding="0,2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="72" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock
+                                Grid.Column="0"
+                                FontSize="11.5"
+                                Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                VerticalAlignment="Center"
+                                Text="{loc:L Zh='Chat 接口', En='Chat URL'}" />
+                            <TextBlock
+                                x:Name="OpenAiChatUrlText"
+                                Grid.Column="1"
+                                FontFamily="{StaticResource StudioMonoFont}"
+                                FontSize="11.5"
+                                Foreground="{ThemeResource StudioTextPrimaryBrush}"
+                                IsTextSelectionEnabled="True"
+                                MaxLines="1"
+                                TextTrimming="CharacterEllipsis"
+                                VerticalAlignment="Center" />
+                            <Button
+                                Grid.Column="2"
+                                Style="{StaticResource ApiMiniCopyButtonStyle}"
+                                Content="{loc:L Zh='复制', En='Copy'}"
+                                Click="OnCopyOpenAiChatUrlClick" />
+                        </Grid>
+
+                        <!-- Row 3: Model ID -->
+                        <Grid ColumnSpacing="8" Padding="0,2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="72" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock
+                                Grid.Column="0"
+                                FontSize="11.5"
+                                Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                VerticalAlignment="Center"
+                                Text="{loc:L Zh='模型名称', En='Model ID'}" />
+                            <TextBlock
+                                x:Name="OpenAiModelIdText"
+                                Grid.Column="1"
+                                FontFamily="{StaticResource StudioMonoFont}"
+                                FontSize="11.5"
+                                Foreground="{ThemeResource StudioTextPrimaryBrush}"
+                                IsTextSelectionEnabled="True"
+                                MaxLines="1"
+                                TextTrimming="CharacterEllipsis"
+                                VerticalAlignment="Center" />
+                            <Button
+                                Grid.Column="2"
+                                Style="{StaticResource ApiMiniCopyButtonStyle}"
+                                Content="{loc:L Zh='复制', En='Copy'}"
+                                Click="OnCopyOpenAiModelIdClick" />
+                        </Grid>
+                    </StackPanel>
+
+                    <TextBlock
+                        FontSize="11.5"
+                        Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                        TextWrapping="Wrap"
+                        Text="{loc:L Zh='支持 stream 流式输出、reasoning_content 深度思考链、image_url 视觉输入与 Function Calling 工具调用；加载图像模型时亦支持 /v1/images/generations。', En='Supports SSE streaming, `reasoning_content` thinking chains, `image_url` vision inputs, and Function Calling; also serves `/v1/images/generations` when an image model is loaded.'}" />
+
+                    <!-- OpenAI snippet segmented picker -->
+                    <Border
+                        Padding="2"
+                        Background="{ThemeResource StudioInputFillBrush}"
+                        BorderBrush="{ThemeResource StudioCardBorderBrush}"
+                        BorderThickness="0.7"
+                        CornerRadius="7">
+                        <Grid ColumnSpacing="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Button
+                                x:Name="OpenAiTabPythonBtn"
+                                Grid.Column="0"
+                                Style="{StaticResource ApiSegmentedTabButtonStyle}"
+                                Content="{loc:L Zh='Python 示例', En='Python SDK'}"
+                                Click="OnOpenAiTabPythonClick" />
+                            <Button
+                                x:Name="OpenAiTabCursorBtn"
+                                Grid.Column="1"
+                                Style="{StaticResource ApiSegmentedTabButtonStyle}"
+                                Content="Cursor"
+                                Click="OnOpenAiTabCursorClick" />
+                            <Button
+                                x:Name="OpenAiTabCurlBtn"
+                                Grid.Column="2"
+                                Style="{StaticResource ApiSegmentedTabButtonStyle}"
+                                Content="curl"
+                                Click="OnOpenAiTabCurlClick" />
+                        </Grid>
+                    </Border>
+
+                    <!-- OpenAI codeSnippetBlock -->
+                    <StackPanel Spacing="4">
+                        <TextBlock
+                            x:Name="OpenAiSnippetTitleText"
+                            FontSize="10.5"
+                            FontWeight="SemiBold"
+                            Foreground="{ThemeResource StudioTextSecondaryBrush}" />
+                        <Border
+                            Height="126"
+                            Background="#FF14171C"
+                            CornerRadius="8"
+                            RequestedTheme="Dark">
+                            <ScrollViewer
+                                HorizontalScrollBarVisibility="Auto"
+                                VerticalScrollBarVisibility="Auto">
+                                <TextBlock
+                                    x:Name="OpenAiSnippetCodeText"
+                                    Padding="10"
+                                    FontFamily="{StaticResource StudioMonoFont}"
+                                    FontSize="11"
+                                    Foreground="#FFE0E0E0"
+                                    IsTextSelectionEnabled="True" />
+                            </ScrollViewer>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- Copy snippet buttons -->
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button
+                            Style="{StaticResource ApiCompactButtonStyle}"
+                            Content="{loc:L Zh='复制 Python 代码', En='Copy Python'}"
+                            Click="OnCopyOpenAiPythonClick" />
+                        <Button
+                            Style="{StaticResource ApiCompactButtonStyle}"
+                            Content="{loc:L Zh='复制 Cursor 配置', En='Copy Cursor'}"
+                            Click="OnCopyOpenAiCursorClick" />
+                        <Button
+                            Style="{StaticResource ApiCompactButtonStyle}"
+                            Content="{loc:L Zh='复制 curl 命令', En='Copy curl'}"
+                            Click="OnCopyOpenAiCurlClick" />
+                    </StackPanel>
+                </StackPanel>
+            </c:WorkspaceCard>
+
+            <!-- Right: Anthropic Messages 协议 -->
+            <c:WorkspaceCard
+                Grid.Column="1"
+                Icon="&#xE943;"
+                Title="{loc:L Zh='Anthropic Messages 协议', En='Anthropic Messages Protocol (`/v1/messages`)'}"
+                Subtitle="{loc:L Zh='原生实现 /v1/messages，兼容 Anthropic SDK 与 Claude Code', En='Native `/v1/messages` endpoint for Anthropic SDK &amp; Claude Code'}">
+                <StackPanel Spacing="10">
+                    <!-- Endpoint rows -->
+                    <StackPanel Spacing="4">
+                        <!-- Row 1: Base URL -->
+                        <Grid ColumnSpacing="8" Padding="0,2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="72" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock
+                                Grid.Column="0"
+                                FontSize="11.5"
+                                Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                VerticalAlignment="Center"
+                                Text="Base URL" />
+                            <TextBlock
+                                x:Name="AnthropicBaseUrlText"
+                                Grid.Column="1"
+                                FontFamily="{StaticResource StudioMonoFont}"
+                                FontSize="11.5"
+                                Foreground="{ThemeResource StudioTextPrimaryBrush}"
+                                IsTextSelectionEnabled="True"
+                                MaxLines="1"
+                                TextTrimming="CharacterEllipsis"
+                                VerticalAlignment="Center" />
+                            <Button
+                                Grid.Column="2"
+                                Style="{StaticResource ApiMiniCopyButtonStyle}"
+                                Content="{loc:L Zh='复制', En='Copy'}"
+                                Click="OnCopyAnthropicBaseUrlClick" />
+                        </Grid>
+
+                        <!-- Row 2: Messages -->
+                        <Grid ColumnSpacing="8" Padding="0,2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="72" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock
+                                Grid.Column="0"
+                                FontSize="11.5"
+                                Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                VerticalAlignment="Center"
+                                Text="Messages" />
+                            <TextBlock
+                                x:Name="AnthropicMessagesUrlText"
+                                Grid.Column="1"
+                                FontFamily="{StaticResource StudioMonoFont}"
+                                FontSize="11.5"
+                                Foreground="{ThemeResource StudioTextPrimaryBrush}"
+                                IsTextSelectionEnabled="True"
+                                MaxLines="1"
+                                TextTrimming="CharacterEllipsis"
+                                VerticalAlignment="Center" />
+                            <Button
+                                Grid.Column="2"
+                                Style="{StaticResource ApiMiniCopyButtonStyle}"
+                                Content="{loc:L Zh='复制', En='Copy'}"
+                                Click="OnCopyAnthropicMessagesUrlClick" />
+                        </Grid>
+
+                        <!-- Row 3: Auth Header -->
+                        <Grid ColumnSpacing="8" Padding="0,2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="72" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock
+                                Grid.Column="0"
+                                FontSize="11.5"
+                                Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                VerticalAlignment="Center"
+                                Text="{loc:L Zh='鉴权请求头', En='Auth Header'}" />
+                            <TextBlock
+                                x:Name="AnthropicAuthHeaderText"
+                                Grid.Column="1"
+                                FontFamily="{StaticResource StudioMonoFont}"
+                                FontSize="11.5"
+                                Foreground="{ThemeResource StudioTextPrimaryBrush}"
+                                IsTextSelectionEnabled="True"
+                                MaxLines="1"
+                                TextTrimming="CharacterEllipsis"
+                                VerticalAlignment="Center" />
+                            <Button
+                                Grid.Column="2"
+                                Style="{StaticResource ApiMiniCopyButtonStyle}"
+                                Content="{loc:L Zh='复制', En='Copy'}"
+                                Click="OnCopyAnthropicAuthHeaderClick" />
+                        </Grid>
+                    </StackPanel>
+
+                    <TextBlock
+                        x:Name="AnthropicDescriptionText"
+                        FontSize="11.5"
+                        Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                        TextWrapping="Wrap" />
+
+                    <!-- Anthropic snippet segmented picker -->
+                    <Border
+                        Padding="2"
+                        Background="{ThemeResource StudioInputFillBrush}"
+                        BorderBrush="{ThemeResource StudioCardBorderBrush}"
+                        BorderThickness="0.7"
+                        CornerRadius="7">
+                        <Grid ColumnSpacing="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Button
+                                x:Name="AnthropicTabClaudeCodeBtn"
+                                Grid.Column="0"
+                                Style="{StaticResource ApiSegmentedTabButtonStyle}"
+                                Content="Claude Code"
+                                Click="OnAnthropicTabClaudeCodeClick" />
+                            <Button
+                                x:Name="AnthropicTabCurlBtn"
+                                Grid.Column="1"
+                                Style="{StaticResource ApiSegmentedTabButtonStyle}"
+                                Content="curl"
+                                Click="OnAnthropicTabCurlClick" />
+                        </Grid>
+                    </Border>
+
+                    <!-- Anthropic codeSnippetBlock -->
+                    <StackPanel Spacing="4">
+                        <TextBlock
+                            x:Name="AnthropicSnippetTitleText"
+                            FontSize="10.5"
+                            FontWeight="SemiBold"
+                            Foreground="{ThemeResource StudioTextSecondaryBrush}" />
+                        <Border
+                            Height="126"
+                            Background="#FF14171C"
+                            CornerRadius="8"
+                            RequestedTheme="Dark">
+                            <ScrollViewer
+                                HorizontalScrollBarVisibility="Auto"
+                                VerticalScrollBarVisibility="Auto">
+                                <TextBlock
+                                    x:Name="AnthropicSnippetCodeText"
+                                    Padding="10"
+                                    FontFamily="{StaticResource StudioMonoFont}"
+                                    FontSize="11"
+                                    Foreground="#FFE0E0E0"
+                                    IsTextSelectionEnabled="True" />
+                            </ScrollViewer>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- Copy snippet buttons -->
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button
+                            Style="{StaticResource ApiCompactButtonStyle}"
+                            Content="{loc:L Zh='复制环境变量配置', En='Copy Claude Code Env'}"
+                            Click="OnCopyClaudeCodeEnvClick" />
+                        <Button
+                            Style="{StaticResource ApiCompactButtonStyle}"
+                            Content="{loc:L Zh='复制 Anthropic curl', En='Copy Anthropic curl'}"
+                            Click="OnCopyAnthropicCurlClick" />
+                    </StackPanel>
+                </StackPanel>
+            </c:WorkspaceCard>
+        </Grid>
+
+    </StackPanel>
+</UserControl>

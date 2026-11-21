@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="EasyColab.Controls.FrameDropWell"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Height="155"
+    HorizontalAlignment="Stretch"
+    AllowDrop="True"
+    DragEnter="OnDragOver"
+    DragLeave="OnDragLeave"
+    DragOver="OnDragOver"
+    Drop="OnDrop">
+
+    <Grid>
+        <Rectangle
+            x:Name="WellRect"
+            Fill="{ThemeResource StudioInputFillBrush}"
+            RadiusX="10"
+            RadiusY="10"
+            Stroke="{ThemeResource StudioCardBorderBrush}"
+            StrokeDashArray="5 5"
+            StrokeThickness="1.2" />
+        <Rectangle
+            x:Name="TargetedRect"
+            RadiusX="10"
+            RadiusY="10"
+            Stroke="{ThemeResource StudioSystemAccentBrush}"
+            StrokeDashArray="3 3"
+            StrokeThickness="2"
+            Visibility="Collapsed" />
+
+        <Grid
+            x:Name="ImageHost"
+            Margin="6"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Visibility="Collapsed">
+            <Border CornerRadius="8">
+                <Image x:Name="PreviewImage" Stretch="Uniform" />
+            </Border>
+            <Button
+                x:Name="ClearButton"
+                Margin="4"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                Click="ClearButton_Click"
+                Style="{StaticResource StudioPlainButtonStyle}">
+                <Grid Width="18" Height="18">
+                    <Ellipse Fill="#A6000000" />
+                    <FontIcon
+                        FontSize="8"
+                        FontWeight="Bold"
+                        Foreground="White"
+                        Glyph="&#xE711;" />
+                </Grid>
+            </Button>
+        </Grid>
+
+        <StackPanel
+            x:Name="EmptyState"
+            Padding="12"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Spacing="6">
+            <FontIcon
+                HorizontalAlignment="Center"
+                FontSize="24"
+                FontWeight="Medium"
+                Foreground="{ThemeResource StudioSystemAccentBrush}"
+                Glyph="&#xE91B;" />
+            <TextBlock
+                x:Name="TitleText"
+                HorizontalAlignment="Center"
+                FontSize="11"
+                FontWeight="SemiBold"
+                Foreground="{ThemeResource StudioTextPrimaryBrush}"
+                TextAlignment="Center"
+                TextWrapping="Wrap" />
+            <TextBlock
+                x:Name="SubtitleText"
+                HorizontalAlignment="Center"
+                FontSize="10"
+                Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                TextAlignment="Center"
+                TextWrapping="Wrap" />
+            <Button
+                x:Name="PickButton"
+                Margin="0,2,0,0"
+                Padding="8,2,8,3"
+                HorizontalAlignment="Center"
+                Click="PickButton_Click"
+                FontSize="11" />
+        </StackPanel>
+    </Grid>
+</UserControl>

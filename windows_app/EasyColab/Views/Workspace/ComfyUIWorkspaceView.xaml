@@ -1,0 +1,823 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="EasyColab.Views.Workspace.ComfyUIWorkspaceView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:c="using:EasyColab.Controls"
+    xmlns:loc="using:EasyColab.Localization">
+
+    <UserControl.Resources>
+        <Style x:Key="CompactWorkspaceButtonStyle" TargetType="Button">
+            <Setter Property="Padding" Value="10,5" />
+            <Setter Property="MinHeight" Value="28" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="CornerRadius" Value="6" />
+        </Style>
+
+        <Style x:Key="LargeWorkspaceButtonStyle" TargetType="Button">
+            <Setter Property="Padding" Value="12,8" />
+            <Setter Property="MinHeight" Value="38" />
+            <Setter Property="FontSize" Value="12.5" />
+            <Setter Property="CornerRadius" Value="7" />
+        </Style>
+
+        <Style x:Key="LargeAccentWorkspaceButtonStyle" TargetType="Button" BasedOn="{StaticResource StudioPrimaryButtonStyle}">
+            <Setter Property="Padding" Value="14,8" />
+            <Setter Property="MinHeight" Value="38" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="CornerRadius" Value="7" />
+        </Style>
+    </UserControl.Resources>
+
+    <StackPanel Spacing="16">
+
+        <!-- 1. 核心画布拉起与全屏浏览器入口卡片 -->
+        <c:WorkspaceCard
+            x:Name="CanvasCard"
+            Icon="&#xE9D9;"
+            Title="{loc:L Zh='云端 ComfyUI 全屏节点画布', En='Cloud ComfyUI Fullscreen Node Canvas'}">
+            <c:WorkspaceCard.Trailing>
+                <Border
+                    Padding="10,4"
+                    Background="{ThemeResource StudioPrimaryOpacity06Brush}"
+                    CornerRadius="10">
+                    <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                        <c:StatusDot x:Name="CanvasStatusDot" />
+                        <TextBlock
+                            x:Name="CanvasStatusLabel"
+                            FontSize="11.5"
+                            FontWeight="SemiBold"
+                            VerticalAlignment="Center" />
+                    </StackPanel>
+                </Border>
+            </c:WorkspaceCard.Trailing>
+
+            <StackPanel Spacing="12">
+                <!-- Running action bar -->
+                <Grid x:Name="RunningActionsPanel" ColumnSpacing="8" Visibility="Collapsed">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Button
+                        x:Name="OpenCanvasButton"
+                        Grid.Column="0"
+                        HorizontalAlignment="Stretch"
+                        Style="{StaticResource LargeAccentWorkspaceButtonStyle}"
+                        Click="OnOpenCanvasClick">
+                        <StackPanel Orientation="Horizontal" Spacing="7" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <FontIcon FontSize="13.5" Glyph="&#xE774;" />
+                            <TextBlock
+                                FontSize="13.5"
+                                FontWeight="SemiBold"
+                                Text="{loc:L Zh='在浏览器打开全屏节点画布', En='Open Fullscreen Canvas in Browser'}" />
+                        </StackPanel>
+                    </Button>
+
+                    <Button
+                        x:Name="CopyCanvasUrlButton"
+                        Grid.Column="1"
+                        Style="{StaticResource LargeWorkspaceButtonStyle}"
+                        Click="OnCopyCanvasUrlClick">
+                        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                            <FontIcon FontSize="12.5" Glyph="&#xE8C8;" />
+                            <TextBlock Text="{loc:L Zh='复制画布链接', En='Copy Canvas URL'}" />
+                        </StackPanel>
+                    </Button>
+
+                    <Button
+                        x:Name="RestartCanvasButton"
+                        Grid.Column="2"
+                        Style="{StaticResource LargeWorkspaceButtonStyle}"
+                        Click="OnRestartCanvasClick">
+                        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                            <FontIcon FontSize="12.5" Glyph="&#xE72C;" />
+                            <TextBlock Text="{loc:L Zh='重启生效', En='Restart'}" />
+                        </StackPanel>
+                    </Button>
+
+                    <Button
+                        x:Name="FreeVramButton"
+                        Grid.Column="3"
+                        Style="{StaticResource LargeWorkspaceButtonStyle}"
+                        Click="OnFreeVramClick">
+                        <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
+                            <FontIcon FontSize="12.5" Glyph="&#xE950;" />
+                            <TextBlock Text="{loc:L Zh='清显存', En='Free VRAM'}" />
+                        </StackPanel>
+                    </Button>
+
+                    <Button
+                        x:Name="StopCanvasButton"
+                        Grid.Column="4"
+                        Style="{StaticResource LargeWorkspaceButtonStyle}"
+                        Click="OnStopCanvasClick">
+                        <FontIcon FontSize="12.5" Foreground="{ThemeResource StudioSystemRedBrush}" Glyph="&#xE71A;" />
+                    </Button>
+                </Grid>
+
+                <!-- Stopped / starting action bar -->
+                <Button
+                    x:Name="StartCanvasButton"
+                    HorizontalAlignment="Stretch"
+                    Style="{StaticResource LargeAccentWorkspaceButtonStyle}"
+                    Click="OnStartCanvasClick">
+                    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <ProgressRing
+                            x:Name="StartCanvasProgressRing"
+                            Width="14"
+                            Height="14"
+                            IsActive="False"
+                            Visibility="Collapsed" />
+                        <FontIcon
+                            x:Name="StartCanvasIcon"
+                            FontSize="14"
+                            Glyph="&#xE945;" />
+                        <TextBlock
+                            x:Name="StartCanvasLabel"
+                            FontSize="13.5"
+                            FontWeight="SemiBold" />
+                    </StackPanel>
+                </Button>
+
+                <!-- Progress bar -->
+                <ProgressBar
+                    x:Name="ComfyTaskProgressBar"
+                    Minimum="0"
+                    Maximum="1"
+                    Value="0"
+                    Visibility="Collapsed" />
+
+                <!-- Status bar -->
+                <Border
+                    Padding="10,7"
+                    Background="{ThemeResource StudioInputFillBrush}"
+                    CornerRadius="8">
+                    <Grid ColumnSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <FontIcon
+                            x:Name="CanvasStatusInfoIcon"
+                            Grid.Column="0"
+                            FontSize="12"
+                            VerticalAlignment="Center"
+                            Glyph="&#xE946;" />
+
+                        <TextBlock
+                            x:Name="CanvasStatusMessageText"
+                            Grid.Column="1"
+                            FontSize="12"
+                            Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                            MaxLines="2"
+                            TextTrimming="CharacterEllipsis"
+                            TextWrapping="Wrap"
+                            VerticalAlignment="Center" />
+
+                        <TextBlock
+                            x:Name="CanvasPublicUrlText"
+                            Grid.Column="2"
+                            FontFamily="{StaticResource StudioMonoFont}"
+                            FontSize="11.5"
+                            Foreground="{ThemeResource StudioSystemAccentBrush}"
+                            IsTextSelectionEnabled="True"
+                            VerticalAlignment="Center"
+                            Visibility="Collapsed" />
+                    </Grid>
+                </Border>
+            </StackPanel>
+        </c:WorkspaceCard>
+
+        <!-- 2. 新手零门槛预置图生视频 / 首尾帧运镜工作流包卡片 -->
+        <c:WorkspaceCard
+            x:Name="PresetPacksCard"
+            Icon="&#xE734;"
+            Title="{loc:L Zh='预置图生视频 / 首尾帧运镜工作流包（一键配齐模型与中文画布）', En='Preset Image-to-Video &amp; First/Last Frame Workflow Packs (1-Click Setup)'}"
+            Subtitle="{loc:L Zh='专为零基础设计：一键 8 线程下齐配套权重、自动生成全中文三步注释工作流并将 ComfyUI 设为简体中文，零红框报错直接出片', En='Turnkey setup: 8-thread download of all required weights plus annotated 3-step workflow templates — zero missing-node errors'}">
+            <c:WorkspaceCard.Trailing>
+                <Border
+                    Padding="9,3.5"
+                    Background="{ThemeResource StudioPrimaryOpacity06Brush}"
+                    CornerRadius="10">
+                    <TextBlock
+                        x:Name="PresetReadyCountText"
+                        FontSize="11"
+                        FontWeight="SemiBold" />
+                </Border>
+            </c:WorkspaceCard.Trailing>
+
+            <StackPanel Spacing="12">
+                <!-- 三步傻瓜引导条 (comfyStepChip) -->
+                <Grid ColumnSpacing="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Step 1 -->
+                    <Border
+                        x:Name="StepChip1"
+                        Grid.Column="0"
+                        Padding="10,7"
+                        Background="{ThemeResource StudioInputFillBrush}"
+                        BorderBrush="{ThemeResource StudioCardBorderBrush}"
+                        BorderThickness="0.7"
+                        CornerRadius="8">
+                        <Grid ColumnSpacing="6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Border
+                                Width="18"
+                                Height="18"
+                                Background="{ThemeResource StudioSystemAccentBrush}"
+                                CornerRadius="9"
+                                VerticalAlignment="Center">
+                                <TextBlock
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    FontSize="10.5"
+                                    FontWeight="Bold"
+                                    Foreground="White"
+                                    Text="1" />
+                            </Border>
+                            <FontIcon
+                                Grid.Column="1"
+                                FontSize="11"
+                                Foreground="{ThemeResource StudioSystemAccentBrush}"
+                                Glyph="&#xE896;"
+                                VerticalAlignment="Center" />
+                            <TextBlock
+                                x:Name="StepChip1Text"
+                                Grid.Column="2"
+                                FontSize="11.5"
+                                FontWeight="Medium"
+                                Foreground="{ThemeResource StudioTextPrimaryBrush}"
+                                MaxLines="1"
+                                TextTrimming="CharacterEllipsis"
+                                VerticalAlignment="Center" />
+                        </Grid>
+                    </Border>
+
+                    <FontIcon
+                        Grid.Column="1"
+                        FontSize="10"
+                        Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                        Opacity="0.6"
+                        Glyph="&#xE76C;"
+                        VerticalAlignment="Center" />
+
+                    <!-- Step 2 -->
+                    <Border
+                        x:Name="StepChip2"
+                        Grid.Column="2"
+                        Padding="10,7"
+                        Background="{ThemeResource StudioInputFillBrush}"
+                        BorderBrush="{ThemeResource StudioCardBorderBrush}"
+                        BorderThickness="0.7"
+                        CornerRadius="8">
+                        <Grid ColumnSpacing="6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Border
+                                Width="18"
+                                Height="18"
+                                Background="{ThemeResource StudioSystemAccentBrush}"
+                                CornerRadius="9"
+                                VerticalAlignment="Center">
+                                <TextBlock
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    FontSize="10.5"
+                                    FontWeight="Bold"
+                                    Foreground="White"
+                                    Text="2" />
+                            </Border>
+                            <FontIcon
+                                Grid.Column="1"
+                                FontSize="11"
+                                Foreground="{ThemeResource StudioSystemAccentBrush}"
+                                Glyph="&#xE8A0;"
+                                VerticalAlignment="Center" />
+                            <TextBlock
+                                x:Name="StepChip2Text"
+                                Grid.Column="2"
+                                FontSize="11.5"
+                                FontWeight="Medium"
+                                Foreground="{ThemeResource StudioTextPrimaryBrush}"
+                                MaxLines="1"
+                                TextTrimming="CharacterEllipsis"
+                                VerticalAlignment="Center" />
+                        </Grid>
+                    </Border>
+
+                    <FontIcon
+                        Grid.Column="3"
+                        FontSize="10"
+                        Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                        Opacity="0.6"
+                        Glyph="&#xE76C;"
+                        VerticalAlignment="Center" />
+
+                    <!-- Step 3 -->
+                    <Border
+                        x:Name="StepChip3"
+                        Grid.Column="4"
+                        Padding="10,7"
+                        Background="{ThemeResource StudioInputFillBrush}"
+                        BorderBrush="{ThemeResource StudioCardBorderBrush}"
+                        BorderThickness="0.7"
+                        CornerRadius="8">
+                        <Grid ColumnSpacing="6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Border
+                                Width="18"
+                                Height="18"
+                                Background="{ThemeResource StudioSystemAccentBrush}"
+                                CornerRadius="9"
+                                VerticalAlignment="Center">
+                                <TextBlock
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    FontSize="10.5"
+                                    FontWeight="Bold"
+                                    Foreground="White"
+                                    Text="3" />
+                            </Border>
+                            <FontIcon
+                                Grid.Column="1"
+                                FontSize="11"
+                                Foreground="{ThemeResource StudioSystemAccentBrush}"
+                                Glyph="&#xE768;"
+                                VerticalAlignment="Center" />
+                            <TextBlock
+                                x:Name="StepChip3Text"
+                                Grid.Column="2"
+                                FontSize="11.5"
+                                FontWeight="Medium"
+                                Foreground="{ThemeResource StudioTextPrimaryBrush}"
+                                MaxLines="1"
+                                TextTrimming="CharacterEllipsis"
+                                VerticalAlignment="Center" />
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <!-- Preset pack rows (keyed in-place updates, zero flicker) -->
+                <StackPanel x:Name="PresetPacksContainer" Spacing="10" />
+            </StackPanel>
+        </c:WorkspaceCard>
+
+        <!-- 3. Google Drive 自动软链持久化矩阵卡片 -->
+        <c:WorkspaceCard
+            Icon="&#xE753;"
+            Title="{loc:L Zh='Google Drive 自动软链与跨实例持久化', En='Google Drive Auto-Symlink Persistence Across Instances'}"
+            Subtitle="{loc:L Zh='新开 G4 实例自动挂载恢复自定义节点（含自动补齐 Python requirements.txt 依赖）、模型权重与工作流，免重复安装', En='Fresh G4 runtimes automatically restore custom nodes (including Python requirements.txt), model weights, and saved workflows'}">
+            <c:WorkspaceCard.Trailing>
+                <Button
+                    x:Name="SyncDriveButton"
+                    Style="{StaticResource CompactWorkspaceButtonStyle}"
+                    Click="OnSyncDriveClick">
+                    <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
+                        <ProgressRing
+                            x:Name="SyncDriveProgressRing"
+                            Width="12"
+                            Height="12"
+                            IsActive="False"
+                            Visibility="Collapsed" />
+                        <FontIcon
+                            x:Name="SyncDriveIcon"
+                            FontSize="11.5"
+                            Glyph="&#xE895;" />
+                        <TextBlock x:Name="SyncDriveLabel" FontSize="11.5" />
+                    </StackPanel>
+                </Button>
+            </c:WorkspaceCard.Trailing>
+
+            <StackPanel Spacing="10">
+                <!-- 3 Metric Tiles (comfyPersistMetricTile) -->
+                <Grid ColumnSpacing="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Tile 1: models/* -->
+                    <Border
+                        Grid.Column="0"
+                        Padding="11"
+                        Background="{ThemeResource StudioInputFillBrush}"
+                        BorderBrush="{ThemeResource StudioCardBorderBrush}"
+                        BorderThickness="0.7"
+                        CornerRadius="9">
+                        <StackPanel Spacing="5">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <FontIcon
+                                    FontSize="12"
+                                    Foreground="{ThemeResource StudioSystemAccentBrush}"
+                                    Glyph="&#xE7B8;"
+                                    VerticalAlignment="Center" />
+                                <TextBlock
+                                    FontSize="11.5"
+                                    FontWeight="SemiBold"
+                                    Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                    MaxLines="1"
+                                    TextTrimming="CharacterEllipsis"
+                                    Text="{loc:L Zh='models/* 模型权重库', En='models/* Weight Library'}" />
+                            </StackPanel>
+                            <TextBlock
+                                x:Name="ModelsCountValueText"
+                                FontSize="14"
+                                FontWeight="Bold"
+                                Foreground="{ThemeResource StudioTextPrimaryBrush}" />
+                            <TextBlock
+                                FontSize="10.5"
+                                Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                MaxLines="2"
+                                TextWrapping="Wrap"
+                                Text="{loc:L Zh='各子目录自动软链至云盘，新节点自建目录自动接管', En='Subfolders symlinked to Drive; new node folders auto-adopted'}" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Tile 2: custom_nodes -->
+                    <Border
+                        Grid.Column="1"
+                        Padding="11"
+                        Background="{ThemeResource StudioInputFillBrush}"
+                        BorderBrush="{ThemeResource StudioCardBorderBrush}"
+                        BorderThickness="0.7"
+                        CornerRadius="9">
+                        <StackPanel Spacing="5">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <FontIcon
+                                    FontSize="12"
+                                    Foreground="{ThemeResource StudioSystemAccentBrush}"
+                                    Glyph="&#xEA86;"
+                                    VerticalAlignment="Center" />
+                                <TextBlock
+                                    FontSize="11.5"
+                                    FontWeight="SemiBold"
+                                    Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                    MaxLines="1"
+                                    TextTrimming="CharacterEllipsis"
+                                    Text="{loc:L Zh='custom_nodes 自定义节点', En='custom_nodes Extensions'}" />
+                            </StackPanel>
+                            <TextBlock
+                                x:Name="CustomNodesCountValueText"
+                                FontSize="14"
+                                FontWeight="Bold"
+                                Foreground="{ThemeResource StudioTextPrimaryBrush}" />
+                            <TextBlock
+                                FontSize="10.5"
+                                Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                MaxLines="2"
+                                TextWrapping="Wrap"
+                                Text="{loc:L Zh='NVMe 高速运行 + 云盘双向镜像 + 自动重装依赖', En='Local NVMe speed + two-way Drive mirror + auto pip deps'}" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Tile 3: workflows -->
+                    <Border
+                        Grid.Column="2"
+                        Padding="11"
+                        Background="{ThemeResource StudioInputFillBrush}"
+                        BorderBrush="{ThemeResource StudioCardBorderBrush}"
+                        BorderThickness="0.7"
+                        CornerRadius="9">
+                        <StackPanel Spacing="5">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <FontIcon
+                                    FontSize="12"
+                                    Foreground="{ThemeResource StudioSystemAccentBrush}"
+                                    Glyph="&#xE9D5;"
+                                    VerticalAlignment="Center" />
+                                <TextBlock
+                                    FontSize="11.5"
+                                    FontWeight="SemiBold"
+                                    Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                    MaxLines="1"
+                                    TextTrimming="CharacterEllipsis"
+                                    Text="{loc:L Zh='workflows 工作流存档', En='workflows Saved Graphs'}" />
+                            </StackPanel>
+                            <TextBlock
+                                x:Name="WorkflowsCountValueText"
+                                FontSize="14"
+                                FontWeight="Bold"
+                                Foreground="{ThemeResource StudioTextPrimaryBrush}" />
+                            <TextBlock
+                                FontSize="10.5"
+                                Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                MaxLines="2"
+                                TextWrapping="Wrap"
+                                Text="{loc:L Zh='画布 Ctrl+S 保存即自动持久化至 Google Drive', En='Saving with Ctrl+S in canvas persists directly to Google Drive'}" />
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- Persistence root row -->
+                <Grid ColumnSpacing="6">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        Grid.Column="0"
+                        FontSize="11.5"
+                        Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                        VerticalAlignment="Center"
+                        Text="{loc:L Zh='云端持久化根路径:', En='Drive Persistence Root:'}" />
+                    <TextBlock
+                        x:Name="PersistRootText"
+                        Grid.Column="1"
+                        FontFamily="{StaticResource StudioMonoFont}"
+                        FontSize="11.5"
+                        Foreground="{ThemeResource StudioTextPrimaryBrush}"
+                        IsTextSelectionEnabled="True"
+                        TextTrimming="CharacterEllipsis"
+                        VerticalAlignment="Center" />
+                    <TextBlock
+                        x:Name="PersistenceLabelText"
+                        Grid.Column="2"
+                        FontSize="11"
+                        FontWeight="SemiBold"
+                        VerticalAlignment="Center" />
+                </Grid>
+            </StackPanel>
+        </c:WorkspaceCard>
+
+        <!-- 4. 8 线程极速下载权重直达 ComfyUI 云盘目录 -->
+        <c:WorkspaceCard
+            Icon="&#xE896;"
+            Title="{loc:L Zh='8 线程极速下载权重至 ComfyUI 云盘目录', En='8-Thread High-Speed Weight Downloader to ComfyUI Drive'}"
+            Subtitle="{loc:L Zh='比浏览器单线程快 5~10 倍，下载完成后自动软链落盘至 Google Drive；在 ComfyUI 画布按 R 键即可刷新选用', En='5–10× faster than single-thread browser downloads, persisted to Google Drive via symlinks; press R in ComfyUI to refresh node dropdowns'}">
+            <StackPanel Spacing="10">
+                <Grid ColumnSpacing="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="285" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Spacing="4">
+                        <TextBlock
+                            FontSize="11.5"
+                            Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                            Text="{loc:L Zh='目标模型目录 (ComfyUI/models/...)', En='Target Subfolder (ComfyUI/models/...)'}" />
+                        <ComboBox
+                            x:Name="WeightSubfolderCombo"
+                            HorizontalAlignment="Stretch"
+                            FontSize="12"
+                            SelectionChanged="OnWeightSubfolderSelectionChanged" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Spacing="4">
+                        <TextBlock
+                            FontSize="11.5"
+                            Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                            Text="{loc:L Zh='HuggingFace 直链 / 下载 URL / 仓库 ID', En='HuggingFace Direct URL / Download Link / Repo ID'}" />
+                        <TextBox
+                            x:Name="WeightSourceTextBox"
+                            FontFamily="{StaticResource StudioMonoFont}"
+                            FontSize="12"
+                            PlaceholderText="{loc:L Zh='如 https://huggingface.co/.../resolve/main/xxx.safetensors', En='e.g. https://huggingface.co/.../resolve/main/xxx.safetensors'}"
+                            Text="{x:Bind ViewModel.ComfyWeightSourceInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    </StackPanel>
+                </Grid>
+
+                <Grid ColumnSpacing="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBox
+                        x:Name="WeightFilenameTextBox"
+                        Grid.Column="0"
+                        FontFamily="{StaticResource StudioMonoFont}"
+                        FontSize="12"
+                        PlaceholderText="{loc:L Zh='直链可留空；填仓库 ID 时填仓库内文件路径（如 split_files/vae/xxx.safetensors）', En='Leave blank for direct URLs; when entering a Repo ID, specify subpath (e.g. split_files/vae/xxx.safetensors)'}"
+                        Text="{x:Bind ViewModel.ComfyWeightFilenameInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <Button
+                        x:Name="DownloadWeightButton"
+                        Grid.Column="1"
+                        Style="{StaticResource StudioPrimaryButtonStyle}"
+                        Padding="12,6"
+                        MinHeight="32"
+                        CornerRadius="6"
+                        Click="OnDownloadWeightClick">
+                        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                            <ProgressRing
+                                x:Name="DownloadWeightProgressRing"
+                                Width="13"
+                                Height="13"
+                                IsActive="False"
+                                Visibility="Collapsed" />
+                            <FontIcon
+                                x:Name="DownloadWeightIcon"
+                                FontSize="12"
+                                Glyph="&#xE945;" />
+                            <TextBlock
+                                x:Name="DownloadWeightLabel"
+                                FontSize="12"
+                                FontWeight="SemiBold" />
+                        </StackPanel>
+                    </Button>
+                </Grid>
+            </StackPanel>
+        </c:WorkspaceCard>
+
+        <!-- 5. ComfyUI 云端输出成片库 + 本地预览联动 -->
+        <Grid ColumnSpacing="14">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="290" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Left: Output Preview Card (mediaPreviewCard) -->
+            <c:WorkspaceCard
+                x:Name="PreviewCard"
+                Grid.Column="0"
+                Icon="&#xE768;"
+                Title="{loc:L Zh='生成结果预览', En='Output Preview'}">
+                <c:WorkspaceCard.Trailing>
+                    <Border
+                        x:Name="PreviewElapsedPill"
+                        Padding="8,3.5"
+                        Background="{ThemeResource StudioAccentBlueFillBrush}"
+                        CornerRadius="10"
+                        Visibility="Collapsed">
+                        <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                            <FontIcon
+                                FontSize="10.5"
+                                Foreground="{ThemeResource StudioSystemAccentBrush}"
+                                Glyph="&#xE916;" />
+                            <TextBlock
+                                x:Name="PreviewElapsedText"
+                                FontFamily="{StaticResource StudioMonoFont}"
+                                FontSize="11"
+                                FontWeight="SemiBold"
+                                Foreground="{ThemeResource StudioSystemAccentBrush}" />
+                        </StackPanel>
+                    </Border>
+                </c:WorkspaceCard.Trailing>
+
+                <StackPanel Spacing="10">
+                    <Border
+                        MinHeight="330"
+                        Background="#FF0F1114"
+                        CornerRadius="9">
+                        <Grid>
+                            <!-- Image preview -->
+                            <Image
+                                x:Name="PreviewImageControl"
+                                Margin="6"
+                                Stretch="Uniform"
+                                Visibility="Collapsed" />
+
+                            <!-- Video preview -->
+                            <MediaPlayerElement
+                                x:Name="PreviewVideoPlayer"
+                                AreTransportControlsEnabled="True"
+                                AutoPlay="False"
+                                Stretch="Uniform"
+                                Visibility="Collapsed" />
+
+                            <!-- Empty state -->
+                            <StackPanel
+                                x:Name="PreviewEmptyState"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Spacing="8"
+                                Padding="16">
+                                <FontIcon
+                                    FontSize="32"
+                                    Foreground="#FF8E95A3"
+                                    Glyph="&#xE714;" />
+                                <TextBlock
+                                    FontSize="12.5"
+                                    Foreground="#FF8E95A3"
+                                    HorizontalTextAlignment="Center"
+                                    TextWrapping="Wrap"
+                                    Text="{loc:L Zh='生成的视频或高清图像将自动下载并在此预览', En='Generated videos or HD images will download automatically and preview here'}" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Current media toolbar -->
+                    <Grid x:Name="PreviewMediaBar" ColumnSpacing="8" Visibility="Collapsed">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <FontIcon
+                            x:Name="PreviewMediaTypeIcon"
+                            Grid.Column="0"
+                            FontSize="12"
+                            Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                            VerticalAlignment="Center"
+                            Glyph="&#xE714;" />
+
+                        <TextBlock
+                            x:Name="PreviewFilenameText"
+                            Grid.Column="1"
+                            FontSize="11.5"
+                            Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                            MaxLines="1"
+                            TextTrimming="CharacterEllipsis"
+                            VerticalAlignment="Center" />
+
+                        <Border
+                            x:Name="PreviewCompactElapsedPill"
+                            Grid.Column="2"
+                            Padding="6,1.5"
+                            Background="{ThemeResource StudioPrimaryOpacity06Brush}"
+                            CornerRadius="10"
+                            VerticalAlignment="Center"
+                            Visibility="Collapsed">
+                            <TextBlock
+                                x:Name="PreviewCompactElapsedText"
+                                FontFamily="{StaticResource StudioMonoFont}"
+                                FontSize="10.5"
+                                FontWeight="Medium"
+                                Foreground="{ThemeResource StudioTextSecondaryBrush}" />
+                        </Border>
+
+                        <Button
+                            x:Name="PreviewPrimaryActionButton"
+                            Grid.Column="3"
+                            Style="{StaticResource CompactWorkspaceButtonStyle}"
+                            Click="OnPreviewPrimaryActionClick" />
+
+                        <Button
+                            Grid.Column="4"
+                            Style="{StaticResource CompactWorkspaceButtonStyle}"
+                            Content="{loc:L Zh='在资源管理器中显示', En='Show in Explorer'}"
+                            Click="OnRevealMediaInExplorerClick" />
+                    </Grid>
+                </StackPanel>
+            </c:WorkspaceCard>
+
+            <!-- Right: ComfyUI Cloud Outputs Card -->
+            <c:WorkspaceCard
+                Grid.Column="1"
+                Icon="&#xE8B9;"
+                Title="{loc:L Zh='ComfyUI 输出成片', En='ComfyUI Cloud Outputs'}"
+                Subtitle="{loc:L Zh='点击一键拉取至本机', En='Click to pull renders to local PC'}">
+                <Grid>
+                    <StackPanel
+                        x:Name="RecentOutputsEmptyState"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Spacing="8"
+                        Padding="8,28">
+                        <FontIcon
+                            FontSize="22"
+                            Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                            Opacity="0.6"
+                            Glyph="&#xE714;" />
+                        <TextBlock
+                            FontSize="11.5"
+                            Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                            HorizontalTextAlignment="Center"
+                            TextWrapping="Wrap"
+                            Text="{loc:L Zh='在 ComfyUI 画布渲染生成的视频与图片会自动显示在此处，并同步保存至 Google Drive', En='Videos and images rendered in the ComfyUI canvas appear here automatically and sync to Google Drive'}" />
+                    </StackPanel>
+
+                    <ScrollViewer
+                        x:Name="RecentOutputsScrollViewer"
+                        MaxHeight="280"
+                        VerticalScrollBarVisibility="Auto"
+                        Visibility="Collapsed">
+                        <StackPanel x:Name="RecentOutputsContainer" Spacing="6" />
+                    </ScrollViewer>
+                </Grid>
+            </c:WorkspaceCard>
+        </Grid>
+
+    </StackPanel>
+</UserControl>

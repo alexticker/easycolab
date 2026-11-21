@@ -1,0 +1,1548 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="EasyColab.Views.SidebarPanel"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:c="using:EasyColab.Controls"
+    xmlns:loc="using:EasyColab.Localization">
+
+    <UserControl.Resources>
+        <Style x:Key="CompactButtonStyle" TargetType="Button" BasedOn="{StaticResource StudioSurfaceButtonStyle}">
+            <Setter Property="Padding" Value="9,0" />
+            <Setter Property="Height" Value="26" />
+            <Setter Property="MinHeight" Value="26" />
+            <Setter Property="MinWidth" Value="0" />
+            <Setter Property="FontSize" Value="11.5" />
+            <Setter Property="CornerRadius" Value="6" />
+        </Style>
+
+        <Style x:Key="CompactAccentButtonStyle" TargetType="Button" BasedOn="{StaticResource StudioPrimaryButtonStyle}">
+            <Setter Property="Padding" Value="10,0" />
+            <Setter Property="Height" Value="28" />
+            <Setter Property="MinHeight" Value="28" />
+            <Setter Property="MinWidth" Value="0" />
+            <Setter Property="FontSize" Value="11.5" />
+            <Setter Property="CornerRadius" Value="6" />
+        </Style>
+
+        <Style x:Key="CompactDestructiveButtonStyle" TargetType="Button" BasedOn="{StaticResource StudioSurfaceButtonStyle}">
+            <Setter Property="Padding" Value="10,0" />
+            <Setter Property="Height" Value="28" />
+            <Setter Property="MinHeight" Value="28" />
+            <Setter Property="MinWidth" Value="0" />
+            <Setter Property="FontSize" Value="11.5" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Foreground" Value="{ThemeResource StudioTextSecondaryBrush}" />
+            <Setter Property="BorderBrush" Value="{ThemeResource StudioCardBorderBrush}" />
+            <Setter Property="Background" Value="{ThemeResource StudioInputFillBrush}" />
+        </Style>
+
+        <Style x:Key="CompactIconButtonStyle" TargetType="Button" BasedOn="{StaticResource StudioPlainButtonStyle}">
+            <Setter Property="Padding" Value="5,4" />
+            <Setter Property="MinWidth" Value="24" />
+            <Setter Property="MinHeight" Value="24" />
+            <Setter Property="CornerRadius" Value="5" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+
+        <Style x:Key="CompactTextBoxStyle" TargetType="TextBox">
+            <Setter Property="FontSize" Value="11.5" />
+            <Setter Property="MinHeight" Value="28" />
+            <Setter Property="Padding" Value="8,4,8,4" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Background" Value="{ThemeResource StudioInputFillBrush}" />
+            <Setter Property="BorderBrush" Value="{ThemeResource StudioCardBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <Style x:Key="CompactPasswordBoxStyle" TargetType="PasswordBox">
+            <Setter Property="FontSize" Value="11.5" />
+            <Setter Property="MinHeight" Value="28" />
+            <Setter Property="Padding" Value="8,4,8,4" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Background" Value="{ThemeResource StudioInputFillBrush}" />
+            <Setter Property="BorderBrush" Value="{ThemeResource StudioCardBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <Style x:Key="CompactComboBoxStyle" TargetType="ComboBox">
+            <Setter Property="FontSize" Value="11.5" />
+            <Setter Property="MinHeight" Value="28" />
+            <Setter Property="Padding" Value="8,3,6,3" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Background" Value="{ThemeResource StudioInputFillBrush}" />
+            <Setter Property="BorderBrush" Value="{ThemeResource StudioCardBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <Style x:Key="CompactSliderStyle" TargetType="Slider">
+            <Setter Property="Margin" Value="0,-2,0,-2" />
+            <Setter Property="MinHeight" Value="24" />
+        </Style>
+    </UserControl.Resources>
+
+    <ScrollViewer
+        HorizontalScrollBarVisibility="Disabled"
+        VerticalScrollBarVisibility="Auto">
+        <StackPanel Padding="14" Spacing="12">
+
+            <!-- 1. Colab Compute Instance Card -->
+            <c:SidebarCard
+                x:Name="ColabInstanceCard"
+                Badge="{loc:L Zh='离线', En='Offline'}"
+                Icon="&#xE950;"
+                Title="{loc:L Zh='Colab 算力实例', En='Colab Compute Instance'}">
+                <StackPanel Spacing="8">
+
+                    <!-- Google Account Row -->
+                    <Grid ColumnSpacing="6">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock
+                            Grid.Column="0"
+                            VerticalAlignment="Center"
+                            FontSize="11.5"
+                            Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                            Text="{loc:L Zh='Google 账号', En='Google Account'}" />
+
+                        <TextBlock
+                            x:Name="AccountLabelText"
+                            Grid.Column="1"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            FontSize="11.5"
+                            FontWeight="Medium"
+                            Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                            TextTrimming="CharacterEllipsis" />
+
+                        <Button
+                            x:Name="AccountRefreshButton"
+                            Grid.Column="2"
+                            Click="AccountRefreshButton_Click"
+                            Content="{loc:L Zh='刷新', En='Refresh'}"
+                            Style="{StaticResource CompactButtonStyle}"
+                            Visibility="Collapsed" />
+
+                        <Button
+                            x:Name="AccountMenuButton"
+                            Grid.Column="3"
+                            Content="{loc:L Zh='换号', En='Account'}"
+                            Style="{StaticResource CompactButtonStyle}"
+                            ToolTipService.ToolTip="{loc:L Zh='切换其他 Google 账号或退出当前绑定', En='Switch to another Google account or sign out'}"
+                            Visibility="Collapsed">
+                            <Button.Flyout>
+                                <MenuFlyout Placement="BottomEdgeAlignedRight">
+                                    <MenuFlyoutItem
+                                        Click="SwitchAccountMenuItem_Click"
+                                        Text="{loc:L Zh='切换 Google 账号...', En='Switch Google Account...'}">
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE8AB;" />
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutSeparator />
+                                    <MenuFlyoutItem
+                                        Click="SignOutMenuItem_Click"
+                                        Text="{loc:L Zh='退出当前账号', En='Sign Out'}">
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xF3B1;" />
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                </MenuFlyout>
+                            </Button.Flyout>
+                        </Button>
+
+                        <Button
+                            x:Name="AccountBindButton"
+                            Grid.Column="3"
+                            Click="AccountBindButton_Click"
+                            Content="{loc:L Zh='绑定', En='Bind'}"
+                            Style="{StaticResource CompactButtonStyle}" />
+                    </Grid>
+
+                    <!-- OAuth Code Paste Row -->
+                    <Grid
+                        x:Name="OAuthCodeRow"
+                        ColumnSpacing="6"
+                        Visibility="Collapsed">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox
+                            x:Name="OAuthCodeBox"
+                            Grid.Column="0"
+                            PlaceholderText="{loc:L Zh='粘贴浏览器显示的授权码', En='Paste auth code from browser'}"
+                            Style="{StaticResource CompactTextBoxStyle}"
+                            TextChanged="OAuthCodeBox_TextChanged" />
+
+                        <Button
+                            Grid.Column="1"
+                            Click="OAuthConfirmButton_Click"
+                            Content="{loc:L Zh='确认', En='Confirm'}"
+                            Style="{StaticResource CompactAccentButtonStyle}" />
+
+                        <Button
+                            Grid.Column="2"
+                            Click="OAuthCancelButton_Click"
+                            Content="{loc:L Zh='取消', En='Cancel'}"
+                            Style="{StaticResource CompactButtonStyle}" />
+                    </Grid>
+
+                    <!-- GPU Picker & Wake/Deploy Row -->
+                    <Grid
+                        x:Name="WakeControlsRow"
+                        ColumnSpacing="6"
+                        Visibility="Collapsed">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="134" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <ComboBox
+                            x:Name="GpuPicker"
+                            Grid.Column="0"
+                            HorizontalAlignment="Stretch"
+                            SelectionChanged="GpuPicker_SelectionChanged"
+                            Style="{StaticResource CompactComboBoxStyle}"
+                            ToolTipService.ToolTip="{loc:L Zh='默认推荐 G4 (NVIDIA RTX PRO 6000 Blackwell · 96GB 显存)', En='Recommended: G4 (NVIDIA RTX PRO 6000 Blackwell · 96GB VRAM)'}">
+                            <ComboBoxItem Content="G4 · PRO 6000" Tag="G4" />
+                            <ComboBoxItem Content="H100 · 80GB" Tag="H100" />
+                            <ComboBoxItem Content="A100 · 80GB" Tag="A100" />
+                            <ComboBoxItem Content="L4 · 24GB" Tag="L4" />
+                            <ComboBoxItem Content="T4 · 16GB" Tag="T4" />
+                        </ComboBox>
+
+                        <Button
+                            x:Name="WakeButton"
+                            Grid.Column="1"
+                            HorizontalAlignment="Stretch"
+                            Click="WakeButton_Click"
+                            Style="{StaticResource CompactAccentButtonStyle}">
+                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                <ProgressRing
+                                    x:Name="WakeSpinner"
+                                    Width="12"
+                                    Height="12"
+                                    IsActive="False"
+                                    Visibility="Collapsed" />
+                                <FontIcon
+                                    x:Name="WakeBoltIcon"
+                                    FontSize="11"
+                                    Glyph="&#xE945;" />
+                                <TextBlock
+                                    x:Name="WakeButtonText"
+                                    FontSize="11.5"
+                                    FontWeight="SemiBold"
+                                    Text="{loc:L Zh='唤醒实例并部署', En='Wake &amp; Deploy'}" />
+                            </StackPanel>
+                        </Button>
+
+                        <Button
+                            x:Name="StopWakeButton"
+                            Grid.Column="2"
+                            Click="StopWakeButton_Click"
+                            Style="{StaticResource CompactDestructiveButtonStyle}"
+                            ToolTipService.ToolTip="{loc:L Zh='停止当前唤醒部署进程', En='Stop active wake process'}"
+                            Visibility="Collapsed">
+                            <FontIcon FontSize="11" Glyph="&#xE71A;" />
+                        </Button>
+                    </Grid>
+
+                    <!-- Server URL Row -->
+                    <Grid ColumnSpacing="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox
+                            x:Name="ServerUrlTextBox"
+                            Grid.Column="0"
+                            FontFamily="{StaticResource StudioMonoFont}"
+                            FontSize="11.5"
+                            PlaceholderText="https://xxxx.gradio.live"
+                            Style="{StaticResource CompactTextBoxStyle}"
+                            TextChanged="ServerUrlTextBox_TextChanged" />
+
+                        <PasswordBox
+                            x:Name="ServerUrlPasswordBox"
+                            Grid.Column="0"
+                            FontFamily="{StaticResource StudioMonoFont}"
+                            FontSize="11.5"
+                            PasswordChanged="ServerUrlPasswordBox_PasswordChanged"
+                            PasswordRevealMode="Hidden"
+                            PlaceholderText="{loc:L Zh='已开启打码保护', En='URL Redacted'}"
+                            Style="{StaticResource CompactPasswordBoxStyle}"
+                            Visibility="Collapsed" />
+
+                        <Button
+                            x:Name="MaskUrlToggleButton"
+                            Grid.Column="1"
+                            Click="MaskUrlToggleButton_Click"
+                            Style="{StaticResource CompactIconButtonStyle}">
+                            <FontIcon
+                                x:Name="MaskUrlIcon"
+                                FontSize="12"
+                                Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                Glyph="&#xE7B3;" />
+                        </Button>
+
+                        <Button
+                            x:Name="ConnectRefreshButton"
+                            Grid.Column="2"
+                            Click="ConnectRefreshButton_Click"
+                            Content="{loc:L Zh='连接', En='Connect'}"
+                            Style="{StaticResource CompactButtonStyle}" />
+
+                        <Button
+                            Grid.Column="3"
+                            Click="GuideHelpButton_Click"
+                            Style="{StaticResource CompactIconButtonStyle}"
+                            ToolTipService.ToolTip="{loc:L Zh='打开新手引导与部署指南', En='Open quick start &amp; deployment guide'}">
+                            <FontIcon
+                                FontSize="12"
+                                Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                Glyph="&#xE897;" />
+                        </Button>
+                    </Grid>
+
+                    <!-- Admin Password Row -->
+                    <Grid ColumnSpacing="6">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock
+                            Grid.Column="0"
+                            VerticalAlignment="Center"
+                            FontSize="11"
+                            Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                            Text="{loc:L Zh='用户名：easycolab', En='User: easycolab'}" />
+
+                        <PasswordBox
+                            x:Name="AdminPasswordBox"
+                            Grid.Column="1"
+                            PasswordChanged="AdminPasswordBox_PasswordChanged"
+                            PlaceholderText="{loc:L Zh='管理密码', En='Management password'}"
+                            Style="{StaticResource CompactPasswordBoxStyle}" />
+
+                        <Button
+                            Grid.Column="2"
+                            Click="CopyAdminPasswordButton_Click"
+                            Content="{loc:L Zh='复制密码', En='Copy password'}"
+                            Style="{StaticResource CompactButtonStyle}" />
+                    </Grid>
+
+                    <!-- GPU & Live Resource Telemetry -->
+                    <StackPanel Margin="0,2,0,0" Spacing="6">
+                        <Grid ColumnSpacing="6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <c:StatusDot
+                                x:Name="GpuStatusDot"
+                                Grid.Column="0"
+                                Color="{ThemeResource StudioSystemOrangeBrush}" />
+
+                            <TextBlock
+                                x:Name="GpuNameText"
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                FontSize="11.5"
+                                FontWeight="SemiBold"
+                                Foreground="{ThemeResource StudioTextPrimaryBrush}"
+                                TextTrimming="CharacterEllipsis" />
+
+                            <Border
+                                x:Name="DrivePersistedBadge"
+                                Grid.Column="2"
+                                Padding="5,1.5"
+                                VerticalAlignment="Center"
+                                Background="{ThemeResource StudioPrimaryOpacity06Brush}"
+                                CornerRadius="10"
+                                Visibility="Collapsed">
+                                <TextBlock
+                                    FontSize="10"
+                                    FontWeight="Medium"
+                                    Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                    Text="{loc:L Zh='云盘持久化', En='Drive Persisted'}" />
+                            </Border>
+
+                            <Button
+                                x:Name="TelemetryModeToggleButton"
+                                Grid.Column="3"
+                                Padding="6,2"
+                                Background="{ThemeResource StudioAccentBlueFillBrush}"
+                                Click="TelemetryModeToggleButton_Click"
+                                CornerRadius="10"
+                                Style="{StaticResource StudioPlainButtonStyle}"
+                                Visibility="Collapsed">
+                                <StackPanel Orientation="Horizontal" Spacing="3">
+                                    <FontIcon
+                                        x:Name="TelemetryModeIcon"
+                                        FontSize="9.5"
+                                        Foreground="{ThemeResource StudioSystemAccentBrush}"
+                                        Glyph="&#xE9D2;" />
+                                    <TextBlock
+                                        x:Name="TelemetryModeText"
+                                        FontSize="10"
+                                        FontWeight="Medium"
+                                        Foreground="{ThemeResource StudioSystemAccentBrush}" />
+                                </StackPanel>
+                            </Button>
+                        </Grid>
+
+                        <StackPanel
+                            x:Name="TelemetryChartsContainer"
+                            Spacing="6"
+                            Visibility="Collapsed">
+
+                            <c:CombinedMultiMetricChartCard
+                                x:Name="CombinedChartCard"
+                                ToolTipService.ToolTip="{loc:L Zh='三线实时对比：显存 VRAM / 系统内存 RAM / 硬盘 Disk', En='Live 3-metric comparison: VRAM / System RAM / Disk'}"
+                                Visibility="Collapsed" />
+
+                            <StackPanel x:Name="SingleChartsPanel" Spacing="5.5">
+                                <c:SingleMetricLineChartCard
+                                    x:Name="VramChartCard"
+                                    AccentColor="#FF5487FA"
+                                    Title="{loc:L Zh='显存 VRAM', En='VRAM'}"
+                                    ToolTipService.ToolTip="{loc:L Zh='悬停查看历史显存占用曲线', En='Hover to inspect historical GPU VRAM usage'}"
+                                    Visibility="Collapsed" />
+                                <c:SingleMetricLineChartCard
+                                    x:Name="RamChartCard"
+                                    AccentColor="#FF1AC287"
+                                    Title="{loc:L Zh='内存 RAM', En='System RAM'}"
+                                    ToolTipService.ToolTip="{loc:L Zh='悬停查看系统内存与热备占用曲线', En='Hover to inspect system RAM &amp; hot-standby usage'}"
+                                    Visibility="Collapsed" />
+                                <c:SingleMetricLineChartCard
+                                    x:Name="DiskChartCard"
+                                    AccentColor="#FF0DBAE0"
+                                    Title="{loc:L Zh='硬盘 Disk', En='Disk'}"
+                                    ToolTipService.ToolTip="{loc:L Zh='悬停查看本地实例 NVMe 磁盘空间曲线', En='Hover to inspect instance NVMe disk usage'}"
+                                    Visibility="Collapsed" />
+                            </StackPanel>
+
+                            <Grid
+                                x:Name="ShmDriveRow"
+                                Padding="2,0"
+                                Visibility="Collapsed">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock
+                                    x:Name="ShmFreeText"
+                                    Grid.Column="0"
+                                    FontSize="10.5"
+                                    Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                    Opacity="0.85" />
+                                <TextBlock
+                                    x:Name="DriveFreeText"
+                                    Grid.Column="1"
+                                    FontSize="10.5"
+                                    Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                    Opacity="0.85" />
+                            </Grid>
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </c:SidebarCard>
+
+            <!-- 2. Compute Quota & Auto-Sleep Card -->
+            <c:SidebarCard
+                Icon="&#xE9D9;"
+                Title="{loc:L Zh='算力额度与自动休眠', En='Compute Quota &amp; Auto-Sleep'}">
+                <StackPanel Spacing="8">
+
+                    <!-- 3-Column Metrics -->
+                    <Grid Padding="0,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" HorizontalAlignment="Center" Spacing="2">
+                            <TextBlock
+                                x:Name="CuBalanceLabel"
+                                HorizontalAlignment="Center"
+                                FontSize="10.5"
+                                Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                Text="{loc:L Zh='预计余额', En='Est. Balance'}" />
+                            <TextBlock
+                                x:Name="CuBalanceValue"
+                                HorizontalAlignment="Center"
+                                FontSize="12"
+                                FontWeight="SemiBold"
+                                Foreground="{ThemeResource StudioTextPrimaryBrush}" />
+                        </StackPanel>
+
+                        <Border
+                            Grid.Column="1"
+                            Height="28"
+                            VerticalAlignment="Center"
+                            Background="{ThemeResource StudioSplitDividerBrush}" />
+
+                        <StackPanel Grid.Column="2" HorizontalAlignment="Center" Spacing="2">
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                FontSize="10.5"
+                                Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                Text="{loc:L Zh='扣费速率', En='Burn Rate'}" />
+                            <TextBlock
+                                x:Name="BurnRateValue"
+                                HorizontalAlignment="Center"
+                                FontSize="12"
+                                FontWeight="SemiBold"
+                                Foreground="{ThemeResource StudioTextSecondaryBrush}" />
+                        </StackPanel>
+
+                        <Border
+                            Grid.Column="3"
+                            Height="28"
+                            VerticalAlignment="Center"
+                            Background="{ThemeResource StudioSplitDividerBrush}" />
+
+                        <StackPanel Grid.Column="4" HorizontalAlignment="Center" Spacing="2">
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                FontSize="10.5"
+                                Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                Text="{loc:L Zh='本次运行', En='Uptime'}" />
+                            <TextBlock
+                                x:Name="UptimeValue"
+                                HorizontalAlignment="Center"
+                                FontSize="12"
+                                FontWeight="SemiBold"
+                                Foreground="{ThemeResource StudioTextSecondaryBrush}" />
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Idle Auto-Sleep Picker -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock
+                            Grid.Column="0"
+                            VerticalAlignment="Center"
+                            FontSize="11.5"
+                            Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                            Text="{loc:L Zh='闲置自动释放', En='Idle Auto-Sleep'}" />
+
+                        <ComboBox
+                            x:Name="IdleTimeoutPicker"
+                            Grid.Column="1"
+                            Width="105"
+                            SelectionChanged="IdleTimeoutPicker_SelectionChanged"
+                            Style="{StaticResource CompactComboBoxStyle}">
+                            <ComboBoxItem Content="{loc:L Zh='15 分钟', En='15m'}" Tag="15" />
+                            <ComboBoxItem Content="{loc:L Zh='30 分钟', En='30m'}" Tag="30" />
+                            <ComboBoxItem Content="{loc:L Zh='60 分钟', En='60m'}" Tag="60" />
+                            <ComboBoxItem Content="{loc:L Zh='关闭', En='Off'}" Tag="0" />
+                        </ComboBox>
+                    </Grid>
+
+                    <TextBlock
+                        x:Name="IdleRemainingText"
+                        FontSize="10.5"
+                        Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                        Visibility="Collapsed" />
+
+                    <Button
+                        x:Name="ReleaseAllButton"
+                        HorizontalAlignment="Stretch"
+                        Click="ReleaseAllButton_Click"
+                        Style="{StaticResource CompactDestructiveButtonStyle}">
+                        <StackPanel Orientation="Horizontal" Spacing="5">
+                            <FontIcon FontSize="11" Glyph="&#xE7E8;" />
+                            <TextBlock x:Name="ReleaseAllButtonText" FontSize="11.5" FontWeight="Medium" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </c:SidebarCard>
+
+            <!-- 3. Open Model Center Card -->
+            <c:SidebarCard
+                x:Name="OpenModelCenterCard"
+                Icon="&#xE71D;"
+                Title="{loc:L Zh='开源模型中心', En='Open Model Center'}">
+                <StackPanel Spacing="8">
+
+                    <!-- Built-in + Custom Model Selector List -->
+                    <StackPanel x:Name="ModelListPanel" Spacing="5" />
+
+                    <!-- Add Custom HF Repo Button -->
+                    <Button
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Stretch"
+                        Padding="9,6"
+                        Background="{ThemeResource StudioAccentBlueFillBrush}"
+                        BorderBrush="{ThemeResource StudioAccentBlueBorderBrush}"
+                        BorderThickness="1"
+                        Click="AddCustomModelButton_Click"
+                        CornerRadius="7"
+                        Style="{StaticResource StudioSurfaceButtonStyle}">
+                        <Grid ColumnSpacing="5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <FontIcon
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                FontSize="11.5"
+                                Foreground="{ThemeResource StudioSystemAccentBrush}"
+                                Glyph="&#xECC8;" />
+                            <TextBlock
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                FontSize="11"
+                                FontWeight="SemiBold"
+                                Foreground="{ThemeResource StudioSystemAccentBrush}"
+                                Text="{loc:L Zh='添加自定义 HuggingFace 模型...', En='Add Custom HuggingFace Repo...'}"
+                                TextTrimming="CharacterEllipsis" />
+                            <TextBlock
+                                Grid.Column="2"
+                                VerticalAlignment="Center"
+                                FontFamily="{StaticResource StudioMonoFont}"
+                                FontSize="9.5"
+                                Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                Opacity="0.8"
+                                Text="GGUF / HF" />
+                        </Grid>
+                    </Button>
+
+                    <!-- Co-Resident in VRAM Section -->
+                    <StackPanel
+                        x:Name="CoResidentSection"
+                        Margin="0,2,0,0"
+                        Spacing="5"
+                        Visibility="Collapsed">
+                        <Grid ColumnSpacing="5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <FontIcon
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                FontSize="10"
+                                Foreground="{ThemeResource StudioSystemGreenBrush}"
+                                Glyph="&#xE950;" />
+                            <TextBlock
+                                x:Name="CoResidentHeaderText"
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                FontSize="10.5"
+                                FontWeight="SemiBold"
+                                Foreground="{ThemeResource StudioTextSecondaryBrush}" />
+                            <Button
+                                x:Name="UnloadAllModelsButton"
+                                Grid.Column="2"
+                                Padding="4,1"
+                                Click="UnloadAllModelsButton_Click"
+                                Style="{StaticResource StudioPlainButtonStyle}"
+                                Visibility="Collapsed">
+                                <TextBlock
+                                    FontSize="10"
+                                    FontWeight="Medium"
+                                    Foreground="{ThemeResource StudioAccentRedBrush}"
+                                    Text="{loc:L Zh='全部释放', En='Unload All'}" />
+                            </Button>
+                        </Grid>
+
+                        <StackPanel x:Name="CoResidentListPanel" Spacing="4" />
+                    </StackPanel>
+
+                    <Border Height="1" Margin="0,2" Background="{ThemeResource StudioSplitDividerBrush}" />
+
+                    <!-- ComfyUI Model Hub Sub-section -->
+                    <StackPanel
+                        x:Name="ComfyHubSection"
+                        Spacing="6"
+                        Visibility="Collapsed">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock
+                                Grid.Column="0"
+                                FontSize="11.5"
+                                Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                Text="{loc:L Zh='画布状态', En='Canvas Status'}" />
+                            <TextBlock
+                                x:Name="ComfyCanvasStatusText"
+                                Grid.Column="1"
+                                FontSize="11.5"
+                                FontWeight="SemiBold" />
+                        </Grid>
+
+                        <ProgressBar
+                            x:Name="ComfyHubProgressBar"
+                            Height="4"
+                            Maximum="1"
+                            Minimum="0"
+                            Visibility="Collapsed" />
+
+                        <Grid x:Name="ComfyRunningButtonsGrid" ColumnSpacing="6" Visibility="Collapsed">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Button
+                                Grid.Column="0"
+                                HorizontalAlignment="Stretch"
+                                Click="OpenComfyCanvasButton_Click"
+                                Style="{StaticResource CompactAccentButtonStyle}">
+                                <StackPanel Orientation="Horizontal" Spacing="5">
+                                    <FontIcon FontSize="11.5" Glyph="&#xE774;" />
+                                    <TextBlock Text="{loc:L Zh='打开画布', En='Open Canvas'}" />
+                                </StackPanel>
+                            </Button>
+                            <Button
+                                Grid.Column="1"
+                                Click="StopComfyButton_Click"
+                                Style="{StaticResource CompactButtonStyle}"
+                                ToolTipService.ToolTip="{loc:L Zh='同步云盘并停止 ComfyUI 进程', En='Sync to Google Drive &amp; stop ComfyUI process'}">
+                                <FontIcon FontSize="11" Glyph="&#xE71A;" />
+                            </Button>
+                        </Grid>
+
+                        <Button
+                            x:Name="StartComfyButton"
+                            HorizontalAlignment="Stretch"
+                            Click="StartComfyButton_Click"
+                            Style="{StaticResource CompactAccentButtonStyle}">
+                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                <ProgressRing
+                                    x:Name="StartComfySpinner"
+                                    Width="12"
+                                    Height="12"
+                                    IsActive="False"
+                                    Visibility="Collapsed" />
+                                <FontIcon
+                                    x:Name="StartComfyIcon"
+                                    FontSize="11.5"
+                                    Glyph="&#xE768;" />
+                                <TextBlock
+                                    x:Name="StartComfyText"
+                                    Text="{loc:L Zh='启动 ComfyUI 画布', En='Start ComfyUI Canvas'}" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+
+                    <!-- Non-ComfyUI Model Hub Sub-section -->
+                    <StackPanel x:Name="StandardHubSection" Spacing="6">
+
+                        <!-- HF Repo Link -->
+                        <Grid ColumnSpacing="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                FontSize="11.5"
+                                Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                Text="{loc:L Zh='HF 仓库', En='HF Repo'}" />
+                            <Button
+                                Grid.Column="1"
+                                HorizontalAlignment="Right"
+                                Click="OpenHfRepoButton_Click"
+                                Style="{StaticResource StudioPlainButtonStyle}"
+                                ToolTipService.ToolTip="{loc:L Zh='在浏览器打开 HuggingFace 模型仓库', En='Open HuggingFace model repository in browser'}">
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <TextBlock
+                                        x:Name="HfRepoIdText"
+                                        FontFamily="{StaticResource StudioMonoFont}"
+                                        FontSize="10.5"
+                                        Foreground="{ThemeResource StudioSystemAccentBrush}"
+                                        TextTrimming="CharacterEllipsis" />
+                                    <FontIcon
+                                        FontSize="9.5"
+                                        Foreground="{ThemeResource StudioSystemAccentBrush}"
+                                        Glyph="&#xE8A7;" />
+                                </StackPanel>
+                            </Button>
+                        </Grid>
+
+                        <!-- Disk Weights Summary -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock
+                                Grid.Column="0"
+                                FontSize="11.5"
+                                Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                Text="{loc:L Zh='磁盘权重', En='Disk Weights'}" />
+                            <TextBlock
+                                x:Name="DiskWeightsSummaryText"
+                                Grid.Column="1"
+                                HorizontalAlignment="Right"
+                                FontSize="11.5"
+                                FontWeight="Medium" />
+                        </Grid>
+
+                        <!-- Collapsible Weight Shards Disclosure -->
+                        <StackPanel Spacing="6">
+                            <Button
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left"
+                                Click="ToggleFileListButton_Click"
+                                Style="{StaticResource StudioPlainButtonStyle}">
+                                <StackPanel Orientation="Horizontal" Spacing="5">
+                                    <FontIcon
+                                        x:Name="FileListChevron"
+                                        FontSize="9.5"
+                                        Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                        Glyph="&#xE76C;" />
+                                    <TextBlock
+                                        x:Name="FileListToggleText"
+                                        FontSize="11.5"
+                                        Foreground="{ThemeResource StudioTextPrimaryBrush}" />
+                                </StackPanel>
+                            </Button>
+
+                            <StackPanel
+                                x:Name="FileListContainer"
+                                Spacing="6"
+                                Visibility="Collapsed">
+                                <ScrollViewer
+                                    MaxHeight="125"
+                                    HorizontalScrollBarVisibility="Disabled"
+                                    VerticalScrollBarVisibility="Auto">
+                                    <StackPanel x:Name="FileListItemsPanel" Padding="0,2,4,0" Spacing="4" />
+                                </ScrollViewer>
+
+                                <Grid ColumnSpacing="6">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock
+                                        Grid.Column="0"
+                                        VerticalAlignment="Center"
+                                        FontSize="10.5"
+                                        Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                        Text="HF Token" />
+                                    <PasswordBox
+                                        x:Name="HfTokenPasswordBox"
+                                        Grid.Column="1"
+                                        FontFamily="{StaticResource StudioMonoFont}"
+                                        FontSize="11"
+                                        PasswordChanged="HfTokenPasswordBox_PasswordChanged"
+                                        PlaceholderText="{loc:L Zh='可选，加速下载或访问受限仓库', En='Optional, faster / gated repos'}"
+                                        Style="{StaticResource CompactPasswordBoxStyle}" />
+                                </Grid>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- LLM/VLM Quick Context Length Selector inside Model Hub -->
+                        <StackPanel
+                            x:Name="HubContextSection"
+                            Spacing="4"
+                            Visibility="Collapsed">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock
+                                    Grid.Column="0"
+                                    VerticalAlignment="Center"
+                                    FontSize="11.5"
+                                    Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                    Text="{loc:L Zh='上下文长度', En='Context Length'}" />
+                                <ComboBox
+                                    x:Name="HubContextPicker"
+                                    Grid.Column="1"
+                                    Width="148"
+                                    SelectionChanged="HubContextPicker_SelectionChanged"
+                                    Style="{StaticResource CompactComboBoxStyle}" />
+                            </Grid>
+
+                            <TextBlock
+                                x:Name="HubContextHintText"
+                                FontSize="10.5"
+                                TextWrapping="Wrap"
+                                Visibility="Collapsed" />
+                        </StackPanel>
+
+                        <!-- Offline Warning Banner -->
+                        <Border
+                            x:Name="OfflineBanner"
+                            Padding="8,6"
+                            Background="{ThemeResource StudioAccentOrangeFillBrush}"
+                            CornerRadius="7"
+                            Visibility="Collapsed">
+                            <Grid ColumnSpacing="6">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <FontIcon
+                                    Grid.Column="0"
+                                    VerticalAlignment="Center"
+                                    FontSize="11"
+                                    Foreground="{ThemeResource StudioAccentOrangeBrush}"
+                                    Glyph="&#xE7BA;" />
+                                <TextBlock
+                                    Grid.Column="1"
+                                    VerticalAlignment="Center"
+                                    FontSize="11"
+                                    FontWeight="Medium"
+                                    Foreground="{ThemeResource StudioAccentOrangeBrush}"
+                                    Text="{loc:L Zh='Colab 实例离线（已闲置释放或未连接）', En='Colab offline (idle-released or disconnected)'}"
+                                    TextTrimming="CharacterEllipsis" />
+                                <Button
+                                    x:Name="OfflineWakeButton"
+                                    Grid.Column="2"
+                                    Padding="7,2"
+                                    MinHeight="22"
+                                    Click="WakeButton_Click"
+                                    FontSize="10.5"
+                                    Style="{StaticResource CompactAccentButtonStyle}"
+                                    Visibility="Collapsed" />
+                                <Button
+                                    x:Name="OfflineReconnectButton"
+                                    Grid.Column="2"
+                                    Padding="7,2"
+                                    MinHeight="22"
+                                    Click="ConnectRefreshButton_Click"
+                                    Content="{loc:L Zh='重连', En='Reconnect'}"
+                                    FontSize="10.5"
+                                    Style="{StaticResource CompactButtonStyle}"
+                                    Visibility="Collapsed" />
+                            </Grid>
+                        </Border>
+
+                        <!-- Model Download / Load Progress -->
+                        <ProgressBar
+                            x:Name="ModelTaskProgressBar"
+                            Height="4"
+                            Maximum="1"
+                            Minimum="0"
+                            Visibility="Collapsed" />
+
+                        <!-- Download / Load / Unload Row -->
+                        <Grid ColumnSpacing="6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <Button
+                                x:Name="DownloadWeightsButton"
+                                Grid.Column="0"
+                                HorizontalAlignment="Stretch"
+                                Click="DownloadWeightsButton_Click"
+                                Style="{StaticResource CompactButtonStyle}">
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <ProgressRing
+                                        x:Name="DownloadSpinner"
+                                        Width="12"
+                                        Height="12"
+                                        IsActive="False"
+                                        Visibility="Collapsed" />
+                                    <FontIcon
+                                        x:Name="DownloadIcon"
+                                        FontSize="11.5"
+                                        Glyph="&#xE896;" />
+                                    <TextBlock
+                                        x:Name="DownloadButtonText"
+                                        FontSize="11.5"
+                                        Text="{loc:L Zh='下载权重', En='Download Weights'}" />
+                                </StackPanel>
+                            </Button>
+
+                            <Button
+                                x:Name="LoadVramButton"
+                                Grid.Column="1"
+                                HorizontalAlignment="Stretch"
+                                Click="LoadVramButton_Click"
+                                Style="{StaticResource CompactAccentButtonStyle}">
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <ProgressRing
+                                        x:Name="LoadVramSpinner"
+                                        Width="12"
+                                        Height="12"
+                                        IsActive="False"
+                                        Visibility="Collapsed" />
+                                    <FontIcon
+                                        x:Name="LoadVramIcon"
+                                        FontSize="11.5"
+                                        Glyph="&#xE950;" />
+                                    <TextBlock
+                                        x:Name="LoadVramButtonText"
+                                        FontSize="11.5"
+                                        Text="{loc:L Zh='加载到显存', En='Load to VRAM'}" />
+                                </StackPanel>
+                            </Button>
+
+                            <Button
+                                x:Name="UnloadActiveModelButton"
+                                Grid.Column="2"
+                                Click="UnloadActiveModelButton_Click"
+                                Style="{StaticResource CompactButtonStyle}"
+                                ToolTipService.ToolTip="{loc:L Zh='将当前模型从 GPU 显存中卸载释放', En='Unload active model from GPU VRAM'}"
+                                Visibility="Collapsed">
+                                <FontIcon FontSize="11.5" Glyph="&#xF847;" />
+                            </Button>
+                        </Grid>
+                    </StackPanel>
+                </StackPanel>
+            </c:SidebarCard>
+
+            <!-- 4. Adaptive Parameters Card -->
+            <c:SidebarCard
+                x:Name="AdaptiveParamsCard"
+                Icon="&#xE9E9;"
+                Title="{loc:L Zh='规格与采样参数', En='Specs &amp; Sampling Params'}">
+                <StackPanel Spacing="9">
+
+                    <!-- Branch A: ComfyUI Persistence & Controls -->
+                    <StackPanel x:Name="ComfyParamsPanel" Spacing="8" Visibility="Collapsed">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock
+                                Grid.Column="0"
+                                FontSize="11.5"
+                                Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                Text="{loc:L Zh='持久化架构', En='Persistence'}" />
+                            <TextBlock
+                                x:Name="ComfyPersistenceValueText"
+                                Grid.Column="1"
+                                FontSize="11"
+                                FontWeight="SemiBold" />
+                        </Grid>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock
+                                Grid.Column="0"
+                                FontSize="11.5"
+                                Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                Text="{loc:L Zh='已存节点 / 权重', En='Saved Nodes / Weights'}" />
+                            <TextBlock
+                                x:Name="ComfySavedCountsText"
+                                Grid.Column="1"
+                                FontSize="11.5"
+                                FontWeight="Medium" />
+                        </Grid>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock
+                                Grid.Column="0"
+                                FontSize="11.5"
+                                Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                Text="{loc:L Zh='画布执行队列', En='Execution Queue'}" />
+                            <TextBlock
+                                x:Name="ComfyQueueText"
+                                Grid.Column="1"
+                                FontSize="11.5"
+                                FontWeight="Medium" />
+                        </Grid>
+
+                        <ToggleSwitch
+                            x:Name="ComfyUnloadOthersToggle"
+                            Margin="0,-2,0,-2"
+                            FontSize="11.5"
+                            OffContent="{loc:L Zh='启动前释放其它常驻模型显存', En='Unload other VRAM models before starting'}"
+                            OnContent="{loc:L Zh='启动前释放其它常驻模型显存', En='Unload other VRAM models before starting'}"
+                            Toggled="ComfyUnloadOthersToggle_Toggled" />
+
+                        <Grid ColumnSpacing="6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Button
+                                x:Name="ComfySyncDriveButton"
+                                Grid.Column="0"
+                                HorizontalAlignment="Stretch"
+                                Click="ComfySyncDriveButton_Click"
+                                Style="{StaticResource CompactButtonStyle}">
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <ProgressRing
+                                        x:Name="ComfySyncSpinner"
+                                        Width="11"
+                                        Height="11"
+                                        IsActive="False"
+                                        Visibility="Collapsed" />
+                                    <FontIcon
+                                        x:Name="ComfySyncIcon"
+                                        FontSize="11"
+                                        Glyph="&#xE753;" />
+                                    <TextBlock
+                                        x:Name="ComfySyncButtonText"
+                                        FontSize="11.5"
+                                        Text="{loc:L Zh='立即同步云盘', En='Sync to Drive'}" />
+                                </StackPanel>
+                            </Button>
+
+                            <Button
+                                x:Name="ComfyFreeVramButton"
+                                Grid.Column="1"
+                                HorizontalAlignment="Stretch"
+                                Click="ComfyFreeVramButton_Click"
+                                Style="{StaticResource CompactButtonStyle}">
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <FontIcon FontSize="11" Glyph="&#xE950;" />
+                                    <TextBlock FontSize="11.5" Text="{loc:L Zh='清缓存显存', En='Free VRAM Cache'}" />
+                                </StackPanel>
+                            </Button>
+                        </Grid>
+                    </StackPanel>
+
+                    <!-- Branch B: LLM / VLM Reasoning & Chat Params -->
+                    <StackPanel x:Name="LlmParamsPanel" Spacing="9" Visibility="Collapsed">
+
+                        <ToggleSwitch
+                            x:Name="EnableThinkingToggle"
+                            Margin="0,-2,0,-2"
+                            FontSize="12"
+                            OffContent="{loc:L Zh='启用深度思考链 (Thinking Mode)', En='Enable Thinking Chain (Thinking Mode)'}"
+                            OnContent="{loc:L Zh='启用深度思考链 (Thinking Mode)', En='Enable Thinking Chain (Thinking Mode)'}"
+                            Toggled="EnableThinkingToggle_Toggled" />
+
+                        <!-- Reasoning Effort 4-pill bar -->
+                        <StackPanel x:Name="ReasoningEffortPanel" Spacing="4">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock
+                                    Grid.Column="0"
+                                    FontSize="11.5"
+                                    Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                    Text="{loc:L Zh='思考深度 (Reasoning Effort)', En='Reasoning Effort'}" />
+                                <TextBlock
+                                    x:Name="ReasoningEffortValueText"
+                                    Grid.Column="1"
+                                    FontFamily="{StaticResource StudioMonoFont}"
+                                    FontSize="10"
+                                    FontWeight="Bold"
+                                    Foreground="{ThemeResource StudioSystemAccentBrush}" />
+                            </Grid>
+
+                            <Grid x:Name="ReasoningEffortButtonsGrid" ColumnSpacing="4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                            </Grid>
+                        </StackPanel>
+
+                        <!-- Context Window (Up to 256K) -->
+                        <StackPanel Spacing="5">
+                            <Grid ColumnSpacing="5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock
+                                    Grid.Column="0"
+                                    VerticalAlignment="Center"
+                                    FontSize="11.5"
+                                    Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                    Text="{loc:L Zh='上下文窗口 (最高 256K)', En='Context Window (Up to 256K)'}" />
+                                <NumberBox
+                                    x:Name="ContextLengthNumberBox"
+                                    Grid.Column="1"
+                                    Width="96"
+                                    FontFamily="{StaticResource StudioMonoFont}"
+                                    FontSize="11.5"
+                                    LargeChange="16"
+                                    Maximum="256"
+                                    Minimum="4"
+                                    SmallChange="4"
+                                    SpinButtonPlacementMode="Compact"
+                                    ValueChanged="ContextLengthNumberBox_ValueChanged" />
+                                <TextBlock
+                                    Grid.Column="2"
+                                    VerticalAlignment="Center"
+                                    FontSize="11.5"
+                                    FontWeight="SemiBold"
+                                    Text="K" />
+                            </Grid>
+
+                            <Slider
+                                x:Name="ContextLengthSlider"
+                                Maximum="256"
+                                Minimum="4"
+                                PointerCaptureLost="ContextLengthSlider_PointerCaptureLost"
+                                StepFrequency="4"
+                                Style="{StaticResource CompactSliderStyle}"
+                                ValueChanged="ContextLengthSlider_ValueChanged" />
+
+                            <Grid x:Name="ContextPresetButtonsGrid" ColumnSpacing="4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                            </Grid>
+
+                            <TextBlock
+                                x:Name="ContextCapacityText"
+                                FontSize="10.5"
+                                Foreground="{ThemeResource StudioTextSecondaryBrush}" />
+                        </StackPanel>
+
+                        <!-- Max Output Tokens -->
+                        <StackPanel Spacing="3">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock
+                                    Grid.Column="0"
+                                    FontSize="11.5"
+                                    Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                    Text="{loc:L Zh='最大输出长度 (含思考链)', En='Max Output Tokens (incl. Thinking)'}" />
+                                <TextBlock
+                                    x:Name="MaxNewTokensValueText"
+                                    Grid.Column="1"
+                                    FontSize="11.5"
+                                    FontWeight="Medium" />
+                            </Grid>
+                            <Slider
+                                x:Name="MaxNewTokensSlider"
+                                Maximum="65536"
+                                Minimum="1024"
+                                StepFrequency="512"
+                                Style="{StaticResource CompactSliderStyle}"
+                                ValueChanged="MaxNewTokensSlider_ValueChanged" />
+                        </StackPanel>
+
+                        <!-- Temperature -->
+                        <StackPanel Spacing="3">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock
+                                    Grid.Column="0"
+                                    FontSize="11.5"
+                                    Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                    Text="{loc:L Zh='采样温度 (Temperature)', En='Temperature'}" />
+                                <TextBlock
+                                    x:Name="TemperatureValueText"
+                                    Grid.Column="1"
+                                    FontSize="11.5"
+                                    FontWeight="Medium" />
+                            </Grid>
+                            <Slider
+                                x:Name="TemperatureSlider"
+                                Maximum="1.5"
+                                Minimum="0.1"
+                                StepFrequency="0.05"
+                                Style="{StaticResource CompactSliderStyle}"
+                                ValueChanged="TemperatureSlider_ValueChanged" />
+                        </StackPanel>
+
+                        <Button
+                            x:Name="ClearChatHistoryButton"
+                            HorizontalAlignment="Stretch"
+                            Click="ClearChatHistoryButton_Click"
+                            Style="{StaticResource CompactButtonStyle}">
+                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                <FontIcon FontSize="11" Glyph="&#xE74D;" />
+                                <TextBlock FontSize="11.5" Text="{loc:L Zh='清空多轮对话历史', En='Clear Chat History'}" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+
+                    <!-- Branch C: Image Params -->
+                    <StackPanel x:Name="ImageParamsPanel" Spacing="9" Visibility="Collapsed">
+                        <StackPanel Spacing="4">
+                            <TextBlock
+                                FontSize="11.5"
+                                Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                Text="{loc:L Zh='输出画幅', En='Output Aspect &amp; Resolution'}" />
+                            <ComboBox
+                                x:Name="ImageResolutionPicker"
+                                HorizontalAlignment="Stretch"
+                                SelectionChanged="ImageResolutionPicker_SelectionChanged"
+                                Style="{StaticResource CompactComboBoxStyle}" />
+                        </StackPanel>
+
+                        <!-- MiniMax-H3-Image Fixed 6 Steps -->
+                        <Grid x:Name="ImageFixedStepsRow" Padding="0,2" Visibility="Collapsed">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock
+                                Grid.Column="0"
+                                FontSize="11.5"
+                                Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                Text="{loc:L Zh='采样步数', En='Sampling Steps'}" />
+                            <TextBlock
+                                Grid.Column="1"
+                                FontSize="11.5"
+                                FontWeight="Medium"
+                                Foreground="{ThemeResource StudioTextPrimaryBrush}"
+                                Text="{loc:L Zh='6 步 (PDD 蒸馏固定)', En='6 steps (PDD Distilled)'}" />
+                        </Grid>
+
+                        <!-- Standard Image Sampling Steps Slider -->
+                        <StackPanel x:Name="ImageStepsSliderPanel" Spacing="3">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock
+                                    Grid.Column="0"
+                                    FontSize="11.5"
+                                    Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                    Text="{loc:L Zh='采样步数', En='Sampling Steps'}" />
+                                <TextBlock
+                                    x:Name="ImageStepsValueText"
+                                    Grid.Column="1"
+                                    FontSize="11.5"
+                                    FontWeight="Medium" />
+                            </Grid>
+                            <Slider
+                                x:Name="ImageStepsSlider"
+                                Maximum="50"
+                                Minimum="4"
+                                StepFrequency="1"
+                                Style="{StaticResource CompactSliderStyle}"
+                                ValueChanged="ImageStepsSlider_ValueChanged" />
+                        </StackPanel>
+
+                        <!-- Z-Image-Turbo I2I Denoising Strength -->
+                        <StackPanel x:Name="DenoisingStrengthPanel" Spacing="3" Visibility="Collapsed">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock
+                                    Grid.Column="0"
+                                    FontSize="11.5"
+                                    Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                    Text="{loc:L Zh='重绘幅度', En='Denoising Strength'}" />
+                                <TextBlock
+                                    x:Name="DenoisingStrengthValueText"
+                                    Grid.Column="1"
+                                    FontSize="11.5"
+                                    FontWeight="Medium" />
+                            </Grid>
+                            <Slider
+                                x:Name="DenoisingStrengthSlider"
+                                Maximum="1.0"
+                                Minimum="0.2"
+                                StepFrequency="0.05"
+                                Style="{StaticResource CompactSliderStyle}"
+                                ValueChanged="DenoisingStrengthSlider_ValueChanged" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Branch D: Video / VideoAudio Params -->
+                    <StackPanel x:Name="VideoParamsPanel" Spacing="9">
+                        <StackPanel Spacing="4">
+                            <TextBlock
+                                FontSize="11.5"
+                                Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                Text="{loc:L Zh='视频分辨率', En='Video Resolution'}" />
+                            <ComboBox
+                                x:Name="VideoResolutionPicker"
+                                HorizontalAlignment="Stretch"
+                                SelectionChanged="VideoResolutionPicker_SelectionChanged"
+                                Style="{StaticResource CompactComboBoxStyle}" />
+                        </StackPanel>
+
+                        <!-- Total Frames (4-15s) -->
+                        <StackPanel Spacing="5">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock
+                                    Grid.Column="0"
+                                    FontSize="11.5"
+                                    Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                    Text="{loc:L Zh='视频总帧数 (4~15 秒)', En='Total Frames (4–15s)'}" />
+                                <TextBlock
+                                    x:Name="VideoFramesValueText"
+                                    Grid.Column="1"
+                                    FontSize="11.5"
+                                    FontWeight="Medium" />
+                            </Grid>
+                            <Slider
+                                x:Name="VideoFramesSlider"
+                                Maximum="362"
+                                Minimum="90"
+                                StepFrequency="1"
+                                Style="{StaticResource CompactSliderStyle}"
+                                ValueChanged="VideoFramesSlider_ValueChanged" />
+                            <Grid x:Name="VideoDurationButtonsGrid" ColumnSpacing="4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                            </Grid>
+                        </StackPanel>
+
+                        <!-- Video Sampling Steps -->
+                        <StackPanel Spacing="3">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock
+                                    Grid.Column="0"
+                                    FontSize="11.5"
+                                    Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                    Text="{loc:L Zh='采样步数', En='Sampling Steps'}" />
+                                <TextBlock
+                                    x:Name="VideoStepsValueText"
+                                    Grid.Column="1"
+                                    FontSize="11.5"
+                                    FontWeight="Medium" />
+                            </Grid>
+                            <Slider
+                                x:Name="VideoStepsSlider"
+                                Maximum="60"
+                                Minimum="10"
+                                StepFrequency="5"
+                                Style="{StaticResource CompactSliderStyle}"
+                                ValueChanged="VideoStepsSlider_ValueChanged" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Shared Seed & Batch Controls (Image & Video/VideoAudio) -->
+                    <StackPanel x:Name="SeedAndBatchPanel" Spacing="8">
+                        <Grid ColumnSpacing="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                FontSize="11.5"
+                                Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                Text="{loc:L Zh='随机种子', En='Seed'}" />
+
+                            <TextBox
+                                x:Name="SeedTextBox"
+                                Grid.Column="1"
+                                Width="96"
+                                FontFamily="{StaticResource StudioMonoFont}"
+                                PlaceholderText="{loc:L Zh='种子', En='Seed'}"
+                                Style="{StaticResource CompactTextBoxStyle}"
+                                TextChanged="SeedTextBox_TextChanged" />
+
+                            <CheckBox
+                                x:Name="RandomizeSeedCheckBox"
+                                Grid.Column="2"
+                                MinWidth="0"
+                                Padding="6,0,0,0"
+                                VerticalAlignment="Center"
+                                Checked="RandomizeSeedCheckBox_Changed"
+                                Content="{loc:L Zh='随机', En='Random'}"
+                                FontSize="11.5"
+                                Unchecked="RandomizeSeedCheckBox_Changed" />
+                        </Grid>
+
+                        <Grid ColumnSpacing="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="192" />
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                FontSize="11.5"
+                                Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                Text="{loc:L Zh='批量连抽', En='Batch Size'}" />
+
+                            <Border
+                                Grid.Column="1"
+                                Padding="2"
+                                Background="{ThemeResource StudioPrimaryOpacity06Brush}"
+                                CornerRadius="8">
+                                <Grid x:Name="BatchButtonsGrid" ColumnSpacing="2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </StackPanel>
+
+                </StackPanel>
+            </c:SidebarCard>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

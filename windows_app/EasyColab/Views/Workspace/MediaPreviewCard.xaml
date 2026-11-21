@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="EasyColab.Views.Workspace.MediaPreviewCard"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:c="using:EasyColab.Controls"
+    xmlns:loc="using:EasyColab.Localization">
+
+    <c:WorkspaceCard
+        x:Name="RootCard"
+        Title="{loc:L Zh='生成结果预览', En='Output Preview'}"
+        Icon="&#xE768;">
+        <c:WorkspaceCard.Trailing>
+            <Border
+                x:Name="HeaderElapsedPill"
+                Padding="8,3.5"
+                Background="{ThemeResource StudioAccentBlueFillBrush}"
+                CornerRadius="10"
+                Visibility="Collapsed">
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                    <FontIcon
+                        FontSize="10.5"
+                        Foreground="{ThemeResource StudioSystemAccentBrush}"
+                        Glyph="&#xE916;" />
+                    <TextBlock
+                        x:Name="HeaderElapsedText"
+                        FontFamily="{StaticResource StudioMonoFont}"
+                        FontSize="11"
+                        FontWeight="SemiBold"
+                        Foreground="{ThemeResource StudioSystemAccentBrush}" />
+                </StackPanel>
+            </Border>
+        </c:WorkspaceCard.Trailing>
+
+        <StackPanel Spacing="10">
+            <!-- Dark theater stage: Swift Color(red: 0.06, green: 0.065, blue: 0.08), minHeight 330 -->
+            <Border
+                MinHeight="330"
+                MaxHeight="460"
+                Background="#FF0F1114"
+                CornerRadius="9">
+                <Grid>
+                    <!-- Image Preview -->
+                    <Border
+                        x:Name="ImageStage"
+                        Margin="6"
+                        CornerRadius="8"
+                        Visibility="Collapsed">
+                        <Image
+                            x:Name="PreviewImage"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Stretch="Uniform" />
+                    </Border>
+
+                    <!-- Video Preview -->
+                    <MediaPlayerElement
+                        x:Name="VideoPlayer"
+                        MinHeight="330"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        AreTransportControlsEnabled="True"
+                        AutoPlay="True"
+                        Stretch="Uniform"
+                        Visibility="Collapsed" />
+
+                    <!-- Empty Placeholder -->
+                    <StackPanel
+                        x:Name="EmptyStage"
+                        Padding="20"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Spacing="8">
+                        <FontIcon
+                            x:Name="EmptyStageIcon"
+                            HorizontalAlignment="Center"
+                            FontSize="32"
+                            Foreground="#FF8E95A3"
+                            Glyph="&#xE8B2;" />
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            FontSize="12.5"
+                            Foreground="#FF8E95A3"
+                            Text="{loc:L Zh='生成的视频或高清图像将自动下载并在此预览', En='Generated videos or HD images will download automatically and preview here'}"
+                            TextAlignment="Center"
+                            TextWrapping="Wrap" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Action Footer Bar (visible when CurrentMediaURL is set) -->
+            <Grid
+                x:Name="MediaFooterBar"
+                ColumnSpacing="8"
+                Visibility="Collapsed">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <FontIcon
+                    x:Name="FooterMediaIcon"
+                    VerticalAlignment="Center"
+                    FontSize="12"
+                    Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                    Glyph="&#xE8B2;" />
+
+                <Grid Grid.Column="1" VerticalAlignment="Center" ColumnSpacing="6">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        x:Name="FooterFilenameText"
+                        VerticalAlignment="Center"
+                        FontSize="11.5"
+                        Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                        MaxLines="1"
+                        TextTrimming="CharacterEllipsis" />
+                    <Border
+                        x:Name="FooterElapsedPill"
+                        Grid.Column="1"
+                        Padding="6,1.5"
+                        VerticalAlignment="Center"
+                        Background="{ThemeResource StudioPrimaryOpacity06Brush}"
+                        CornerRadius="10"
+                        Visibility="Collapsed">
+                        <TextBlock
+                            x:Name="FooterElapsedText"
+                            FontFamily="{StaticResource StudioMonoFont}"
+                            FontSize="10.5"
+                            FontWeight="Medium"
+                            Foreground="{ThemeResource StudioTextSecondaryBrush}" />
+                    </Border>
+                </Grid>
+
+                <StackPanel
+                    Grid.Column="2"
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal"
+                    Spacing="6">
+                    <Button
+                        x:Name="ReplayButton"
+                        Padding="8,3"
+                        Click="ReplayButton_Click"
+                        Content="{loc:L Zh='重播', En='Replay'}"
+                        FontSize="11.5"
+                        Visibility="Collapsed" />
+                    <Button
+                        x:Name="OpenFileButton"
+                        Padding="8,3"
+                        Click="OpenFileButton_Click"
+                        Content="{loc:L Zh='打开', En='Open'}"
+                        FontSize="11.5"
+                        Visibility="Collapsed" />
+                    <Button
+                        x:Name="RevealInExplorerButton"
+                        Padding="8,3"
+                        Click="RevealInExplorerButton_Click"
+                        Content="{loc:L Zh='在资源管理器中显示', En='Show in Explorer'}"
+                        FontSize="11.5" />
+                    <Button
+                        x:Name="OpenFolderButton"
+                        Padding="7,3"
+                        Click="OpenFolderButton_Click"
+                        FontSize="11.5"
+                        ToolTipService.ToolTip="{loc:L Zh='打开本地输出目录', En='Open local output folder'}">
+                        <FontIcon FontSize="12" Glyph="&#xE8B7;" />
+                    </Button>
+                    <Button
+                        x:Name="RefreshMediaButton"
+                        Padding="7,3"
+                        Click="RefreshMediaButton_Click"
+                        FontSize="11.5"
+                        ToolTipService.ToolTip="{loc:L Zh='刷新本地列表', En='Refresh local media list'}">
+                        <FontIcon FontSize="12" Glyph="&#xE72C;" />
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+    </c:WorkspaceCard>
+</UserControl>

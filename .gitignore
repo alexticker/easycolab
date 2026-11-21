@@ -68,8 +68,15 @@ pkce_verifier.txt
 # Local Generated Media & Temporary Outputs
 outputs/
 models/
+!windows_app/EasyColab/Models/
 *.mp4
 *.mov
 *.wav
 *.gguf
 *.safetensors
+
+# .NET / WinUI 3 build outputs
+windows_app/EasyColab/bin/
+windows_app/EasyColab/obj/
+*.user
+.vs/
