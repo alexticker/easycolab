@@ -54,9 +54,21 @@ public static class StudioColors
     public static WinColor SystemGreen(ElementTheme theme) =>
         theme == ElementTheme.Dark ? WinColor.FromArgb(0xFF, 0x30, 0xD1, 0x58) : WinColor.FromArgb(0xFF, 0x34, 0xC7, 0x59);
 
-    /// <summary>SwiftUI <c>Color.accentColor</c> (macOS default blue accent).</summary>
-    public static WinColor SystemAccent(ElementTheme theme) =>
-        theme == ElementTheme.Dark ? WinColor.FromArgb(0xFF, 0x0A, 0x84, 0xFF) : WinColor.FromArgb(0xFF, 0x00, 0x7A, 0xFF);
+    /// <summary>Windows 11 Fluent 2 system accent colour (follows user's OS accent colour).</summary>
+    public static WinColor SystemAccent(ElementTheme theme)
+    {
+        try
+        {
+            if (Application.Current?.Resources is { } res)
+            {
+                string key = theme == ElementTheme.Dark ? "SystemAccentColorLight2" : "SystemAccentColorDark1";
+                if (res.TryGetValue(key, out var val) && val is WinColor c) return c;
+                if (res.TryGetValue("SystemAccentColor", out var baseVal) && baseVal is WinColor bc) return bc;
+            }
+        }
+        catch { }
+        return theme == ElementTheme.Dark ? WinColor.FromArgb(0xFF, 0x60, 0xCD, 0xFF) : WinColor.FromArgb(0xFF, 0x00, 0x67, 0xC0);
+    }
 
     /// <summary>Swift telemetry colours used by the main view (<c>Color(red:green:blue:)</c>).</summary>
     public static readonly WinColor VramBlue = FromRgb(0.33, 0.53, 0.98);

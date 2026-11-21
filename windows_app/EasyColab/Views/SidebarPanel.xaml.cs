@@ -482,40 +482,51 @@ public sealed partial class SidebarPanel : UserControl
             bool isLoaded = ViewModel.LoadedModelIds.Contains(spec.Id)
                 || (ViewModel.LoadedModelId == spec.Id && ViewModel.ModelLoaded);
 
+            // Windows 11 NavigationView-style item row: left 3px accent selection pill + subtle fill (no heavy border)
             var rowGrid = new Grid { ColumnSpacing = 9 };
-            rowGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-            rowGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            rowGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-            rowGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            rowGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto }); // selection indicator
+            rowGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto }); // icon
+            rowGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }); // text
+            rowGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto }); // delete
+
+            var indicatorPill = new Border
+            {
+                Width = 3,
+                Height = 18,
+                CornerRadius = new CornerRadius(1.5),
+                VerticalAlignment = VerticalAlignment.Center,
+                Background = isSelected ? accentBrush : transparentBrush,
+            };
+            Grid.SetColumn(indicatorPill, 0);
+            rowGrid.Children.Add(indicatorPill);
 
             // Icon box
             var iconBox = new Border
             {
                 Width = 26,
                 Height = 26,
-                CornerRadius = new CornerRadius(6),
-                Background = isSelected ? accentBrush : accentFillBrush,
+                CornerRadius = new CornerRadius(5),
+                Background = isSelected ? accentFillBrush : ResolveBrush("StudioPrimaryOpacity06Brush"),
                 Child = new FontIcon
                 {
                     Glyph = MapSfSymbolToGlyph(spec.Icon),
                     FontSize = 12.5,
-                    FontWeight = FontWeights.SemiBold,
-                    Foreground = isSelected ? whiteBrush : accentBrush,
+                    Foreground = isSelected ? accentBrush : secondaryText,
                     HorizontalAlignment = HorizontalAlignment.Center,
                     VerticalAlignment = VerticalAlignment.Center,
                 },
             };
-            Grid.SetColumn(iconBox, 0);
+            Grid.SetColumn(iconBox, 1);
             rowGrid.Children.Add(iconBox);
 
             // Title + live badge + subtitle
-            var infoStack = new StackPanel { Spacing = 1.5, VerticalAlignment = VerticalAlignment.Center };
+            var infoStack = new StackPanel { Spacing = 1, VerticalAlignment = VerticalAlignment.Center };
             var titleRow = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 5 };
             titleRow.Children.Add(new TextBlock
             {
                 Text = spec.Name,
                 FontSize = 12.5,
-                FontWeight = FontWeights.SemiBold,
+                FontWeight = isSelected ? FontWeights.SemiBold : FontWeights.Normal,
                 Foreground = primaryText,
                 TextTrimming = TextTrimming.CharacterEllipsis,
             });
@@ -539,7 +550,7 @@ public sealed partial class SidebarPanel : UserControl
                 Foreground = secondaryText,
                 TextTrimming = TextTrimming.CharacterEllipsis,
             });
-            Grid.SetColumn(infoStack, 1);
+            Grid.SetColumn(infoStack, 2);
             rowGrid.Children.Add(infoStack);
 
             // Custom model delete button
@@ -553,40 +564,22 @@ public sealed partial class SidebarPanel : UserControl
                 };
                 ToolTipService.SetToolTip(delBtn, L($"移除自定义模型 {spec.Name}", $"Remove custom model {spec.Name}"));
                 delBtn.Click += async (_, _) => await ViewModel.RemoveCustomHFModelAsync(captured);
-                Grid.SetColumn(delBtn, 2);
+                Grid.SetColumn(delBtn, 3);
                 rowGrid.Children.Add(delBtn);
             }
 
-            if (isSelected)
-            {
-                var check = new FontIcon
-                {
-                    Glyph = "\uE73E",
-                    FontSize = 13,
-                    Foreground = accentBrush,
-                    VerticalAlignment = VerticalAlignment.Center,
-                };
-                Grid.SetColumn(check, 3);
-                rowGrid.Children.Add(check);
-            }
-
-            var border = new Border
-            {
-                Padding = new Thickness(8, 6, 8, 6),
-                CornerRadius = new CornerRadius(8),
-                Background = isSelected ? accentFillBrush : inputFillBrush,
-                BorderBrush = isSelected ? accentBrush : transparentBrush,
-                BorderThickness = new Thickness(1),
-                Child = rowGrid,
-            };
-
+            var selectedRowFill = ResolveBrush("StudioPrimaryOpacity06Brush");
             var specCaptured = spec;
             var btn = new Button
             {
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 HorizontalContentAlignment = HorizontalAlignment.Stretch,
-                Style = (Style)Application.Current.Resources["StudioPlainButtonStyle"],
-                Content = border,
+                Height = double.NaN,
+                Padding = new Thickness(4, 6, 8, 6),
+                CornerRadius = new CornerRadius(6),
+                Background = isSelected ? selectedRowFill : transparentBrush,
+                Style = (Style)Application.Current.Resources["StudioTitleBarButtonStyle"],
+                Content = rowGrid,
             };
             btn.Click += (_, _) => ViewModel.SwitchSelectedModel(specCaptured);
 

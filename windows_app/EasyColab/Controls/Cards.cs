@@ -14,7 +14,6 @@ namespace EasyColab.Controls;
 [ContentProperty(Name = nameof(Content))]
 public sealed partial class SidebarCard : ContentControl
 {
-    private SoftShadow? _shadow;
     private FrameworkElement? _badge;
 
     public SidebarCard()
@@ -57,13 +56,6 @@ public sealed partial class SidebarCard : ContentControl
         base.OnApplyTemplate();
         _badge = GetTemplateChild("BadgeCapsule") as FrameworkElement;
         UpdateBadge();
-        if (GetTemplateChild("ShadowHost") is FrameworkElement host)
-        {
-            _shadow = new SoftShadow(host, ellipse: false, cornerRadius: 10, radius: 3, offsetY: 1,
-                shapeFill: t => StudioColors.ResolveThemeColor("StudioSidebarCardFillBrush", t,
-                    t == ElementTheme.Dark ? WinColor.FromArgb(0xFF, 0x28, 0x2B, 0x33) : WinColor.FromArgb(0xFF, 0xFB, 0xFC, 0xFF)),
-                shadowColor: t => (Microsoft.UI.Colors.Black, t == ElementTheme.Dark ? 0.22f : 0.04f));
-        }
     }
 
     private void UpdateBadge()
@@ -81,7 +73,6 @@ public sealed partial class SidebarCard : ContentControl
 [ContentProperty(Name = nameof(Content))]
 public sealed partial class WorkspaceCard : ContentControl
 {
-    private SoftShadow? _shadow;
     private FrameworkElement? _icon;
     private FrameworkElement? _subtitle;
     private FrameworkElement? _trailing;
@@ -139,13 +130,6 @@ public sealed partial class WorkspaceCard : ContentControl
         _subtitle = GetTemplateChild("SubtitleText") as FrameworkElement;
         _trailing = GetTemplateChild("TrailingPresenter") as FrameworkElement;
         UpdateParts();
-        if (GetTemplateChild("ShadowHost") is FrameworkElement host)
-        {
-            _shadow = new SoftShadow(host, ellipse: false, cornerRadius: 11, radius: 4, offsetY: 1.5,
-                shapeFill: t => StudioColors.ResolveThemeColor("StudioWorkspaceCardFillBrush", t,
-                    t == ElementTheme.Dark ? WinColor.FromArgb(0xFF, 0x20, 0x22, 0x29) : WinColor.FromArgb(0xFF, 0xFF, 0xFF, 0xFF)),
-                shadowColor: t => (Microsoft.UI.Colors.Black, t == ElementTheme.Dark ? 0.25f : 0.035f));
-        }
     }
 
     private void UpdateParts()

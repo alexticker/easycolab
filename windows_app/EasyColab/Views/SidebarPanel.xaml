@@ -8,74 +8,61 @@
 
     <UserControl.Resources>
         <Style x:Key="CompactButtonStyle" TargetType="Button" BasedOn="{StaticResource StudioSurfaceButtonStyle}">
-            <Setter Property="Padding" Value="9,0" />
-            <Setter Property="Height" Value="26" />
-            <Setter Property="MinHeight" Value="26" />
+            <Setter Property="Padding" Value="9,3" />
+            <Setter Property="MinHeight" Value="28" />
             <Setter Property="MinWidth" Value="0" />
-            <Setter Property="FontSize" Value="11.5" />
-            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="CornerRadius" Value="5" />
         </Style>
 
         <Style x:Key="CompactAccentButtonStyle" TargetType="Button" BasedOn="{StaticResource StudioPrimaryButtonStyle}">
-            <Setter Property="Padding" Value="10,0" />
-            <Setter Property="Height" Value="28" />
+            <Setter Property="Padding" Value="10,4" />
             <Setter Property="MinHeight" Value="28" />
             <Setter Property="MinWidth" Value="0" />
-            <Setter Property="FontSize" Value="11.5" />
-            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="CornerRadius" Value="5" />
         </Style>
 
         <Style x:Key="CompactDestructiveButtonStyle" TargetType="Button" BasedOn="{StaticResource StudioSurfaceButtonStyle}">
-            <Setter Property="Padding" Value="10,0" />
-            <Setter Property="Height" Value="28" />
+            <Setter Property="Padding" Value="10,4" />
             <Setter Property="MinHeight" Value="28" />
             <Setter Property="MinWidth" Value="0" />
-            <Setter Property="FontSize" Value="11.5" />
-            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="CornerRadius" Value="5" />
             <Setter Property="Foreground" Value="{ThemeResource StudioTextSecondaryBrush}" />
-            <Setter Property="BorderBrush" Value="{ThemeResource StudioCardBorderBrush}" />
-            <Setter Property="Background" Value="{ThemeResource StudioInputFillBrush}" />
         </Style>
 
-        <Style x:Key="CompactIconButtonStyle" TargetType="Button" BasedOn="{StaticResource StudioPlainButtonStyle}">
-            <Setter Property="Padding" Value="5,4" />
-            <Setter Property="MinWidth" Value="24" />
-            <Setter Property="MinHeight" Value="24" />
+        <Style x:Key="CompactIconButtonStyle" TargetType="Button" BasedOn="{StaticResource StudioTitleBarButtonStyle}">
+            <Setter Property="Padding" Value="5,0" />
+            <Setter Property="MinWidth" Value="26" />
+            <Setter Property="Height" Value="26" />
             <Setter Property="CornerRadius" Value="5" />
             <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
 
+        <!-- Preserve native WinUI 3 Fluent 2 TextBox / PasswordBox / ComboBox chrome & elevation -->
         <Style x:Key="CompactTextBoxStyle" TargetType="TextBox">
-            <Setter Property="FontSize" Value="11.5" />
+            <Setter Property="FontSize" Value="12" />
             <Setter Property="MinHeight" Value="28" />
             <Setter Property="Padding" Value="8,4,8,4" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="CornerRadius" Value="6" />
-            <Setter Property="Background" Value="{ThemeResource StudioInputFillBrush}" />
-            <Setter Property="BorderBrush" Value="{ThemeResource StudioCardBorderBrush}" />
-            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="5" />
         </Style>
 
         <Style x:Key="CompactPasswordBoxStyle" TargetType="PasswordBox">
-            <Setter Property="FontSize" Value="11.5" />
+            <Setter Property="FontSize" Value="12" />
             <Setter Property="MinHeight" Value="28" />
             <Setter Property="Padding" Value="8,4,8,4" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="CornerRadius" Value="6" />
-            <Setter Property="Background" Value="{ThemeResource StudioInputFillBrush}" />
-            <Setter Property="BorderBrush" Value="{ThemeResource StudioCardBorderBrush}" />
-            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="5" />
         </Style>
 
         <Style x:Key="CompactComboBoxStyle" TargetType="ComboBox">
-            <Setter Property="FontSize" Value="11.5" />
+            <Setter Property="FontSize" Value="12" />
             <Setter Property="MinHeight" Value="28" />
             <Setter Property="Padding" Value="8,3,6,3" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="CornerRadius" Value="6" />
-            <Setter Property="Background" Value="{ThemeResource StudioInputFillBrush}" />
-            <Setter Property="BorderBrush" Value="{ThemeResource StudioCardBorderBrush}" />
-            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="5" />
         </Style>
 
         <Style x:Key="CompactSliderStyle" TargetType="Slider">
@@ -87,7 +74,7 @@
     <ScrollViewer
         HorizontalScrollBarVisibility="Disabled"
         VerticalScrollBarVisibility="Auto">
-        <StackPanel Padding="14" Spacing="12">
+        <StackPanel Padding="10,0,10,12" Spacing="10">
 
             <!-- 1. Colab Compute Instance Card -->
             <c:SidebarCard
@@ -596,18 +583,15 @@
                     <!-- Built-in + Custom Model Selector List -->
                     <StackPanel x:Name="ModelListPanel" Spacing="5" />
 
-                    <!-- Add Custom HF Repo Button -->
+                    <!-- Add Custom HF Repo Button (Native Fluent 2 surface button) -->
                     <Button
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Stretch"
-                        Padding="9,6"
-                        Background="{ThemeResource StudioAccentBlueFillBrush}"
-                        BorderBrush="{ThemeResource StudioAccentBlueBorderBrush}"
-                        BorderThickness="1"
+                        Padding="10,6"
                         Click="AddCustomModelButton_Click"
-                        CornerRadius="7"
+                        CornerRadius="6"
                         Style="{StaticResource StudioSurfaceButtonStyle}">
-                        <Grid ColumnSpacing="5">
+                        <Grid ColumnSpacing="6">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
@@ -616,24 +600,23 @@
                             <FontIcon
                                 Grid.Column="0"
                                 VerticalAlignment="Center"
-                                FontSize="11.5"
-                                Foreground="{ThemeResource StudioSystemAccentBrush}"
-                                Glyph="&#xECC8;" />
+                                FontSize="12"
+                                Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                Glyph="&#xE710;" />
                             <TextBlock
                                 Grid.Column="1"
                                 VerticalAlignment="Center"
-                                FontSize="11"
+                                FontSize="11.5"
                                 FontWeight="SemiBold"
-                                Foreground="{ThemeResource StudioSystemAccentBrush}"
-                                Text="{loc:L Zh='添加自定义 HuggingFace 模型...', En='Add Custom HuggingFace Repo...'}"
+                                Foreground="{ThemeResource StudioTextPrimaryBrush}"
+                                Text="{loc:L Zh='添加自定义 HuggingFace 模型', En='Add Custom HuggingFace Repo'}"
                                 TextTrimming="CharacterEllipsis" />
                             <TextBlock
                                 Grid.Column="2"
                                 VerticalAlignment="Center"
                                 FontFamily="{StaticResource StudioMonoFont}"
-                                FontSize="9.5"
+                                FontSize="10"
                                 Foreground="{ThemeResource StudioTextSecondaryBrush}"
-                                Opacity="0.8"
                                 Text="GGUF / HF" />
                         </Grid>
                     </Button>

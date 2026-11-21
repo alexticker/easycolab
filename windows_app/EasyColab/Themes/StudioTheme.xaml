@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  EasyColab Studio palette — 1:1 port of macOS `StudioPalette` (ModelsAndCatalogs.swift).
-  Every brush is theme-aware: use {ThemeResource Studio...Brush} in XAML so that switching
-  RequestedTheme on the root element re-evaluates colours instantly without rebuilding UI.
+  EasyColab Studio Theme — Native Windows 11 Fluent 2 design tokens.
+  Uses translucent Mica-compatible layers, official CardStroke/CardBackground opacities,
+  and native WinUI 3 DefaultButtonStyle / AccentButtonStyle / Subtle button chromes.
 -->
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -11,123 +11,111 @@
 
     <ResourceDictionary.ThemeDictionaries>
         <ResourceDictionary x:Key="Dark">
-            <SolidColorBrush x:Key="StudioSidebarBackgroundBrush" Color="#FF1C1F25" />
-            <SolidColorBrush x:Key="StudioSidebarCardFillBrush" Color="#FF282B33" />
-            <SolidColorBrush x:Key="StudioWorkspaceCanvasBrush" Color="#FF121418" />
-            <SolidColorBrush x:Key="StudioWorkspaceCardFillBrush" Color="#FF202229" />
-            <SolidColorBrush x:Key="StudioLogHeaderBackgroundBrush" Color="#FF1A1D23" />
-            <SolidColorBrush x:Key="StudioLogPanelBackgroundBrush" Color="#FF16181E" />
-            <SolidColorBrush x:Key="StudioLogTerminalFillBrush" Color="#FF12151B" />
-            <SolidColorBrush x:Key="StudioSplitDividerBrush" Color="#24FFFFFF" />
-            <SolidColorBrush x:Key="StudioCardBorderBrush" Color="#17FFFFFF" />
-            <SolidColorBrush x:Key="StudioInputFillBrush" Color="#FF17191E" />
-            <SolidColorBrush x:Key="StudioTextPrimaryBrush" Color="#FFF1F5F9" />
-            <SolidColorBrush x:Key="StudioTextSecondaryBrush" Color="#FF94A3B8" />
-            <SolidColorBrush x:Key="StudioTextTertiaryBrush" Color="#FF64748B" />
-            <SolidColorBrush x:Key="StudioAccentBlueBrush" Color="#FF60A5FA" />
-            <SolidColorBrush x:Key="StudioAccentBlueFillBrush" Color="#240A84FF" />
-            <SolidColorBrush x:Key="StudioAccentBlueBorderBrush" Color="#4D0A84FF" />
-            <SolidColorBrush x:Key="StudioSurfaceButtonBrush" Color="#FF262A34" />
-            <SolidColorBrush x:Key="StudioSurfaceButtonHoverBrush" Color="#FF303542" />
-            <SolidColorBrush x:Key="StudioSurfaceButtonPressedBrush" Color="#FF1E222B" />
-            <SolidColorBrush x:Key="StudioPrimaryBtnBgBrush" Color="#FF0A84FF" />
-            <SolidColorBrush x:Key="StudioPrimaryBtnHoverBrush" Color="#FF2192FF" />
-            <SolidColorBrush x:Key="StudioPrimaryBtnPressedBrush" Color="#FF006EE6" />
-            <SolidColorBrush x:Key="StudioPrimaryBtnDisabledBrush" Color="#550A84FF" />
-            <SolidColorBrush x:Key="StudioAccentGreenBrush" Color="#FF34D399" />
-            <SolidColorBrush x:Key="StudioAccentGreenFillBrush" Color="#2910B981" />
-            <SolidColorBrush x:Key="StudioAccentOrangeBrush" Color="#FFFBBF24" />
-            <SolidColorBrush x:Key="StudioAccentOrangeFillBrush" Color="#29F59E0B" />
-            <SolidColorBrush x:Key="StudioAccentRedBrush" Color="#FFF87171" />
-            <SolidColorBrush x:Key="StudioAccentRedFillBrush" Color="#29EF4444" />
-            <SolidColorBrush x:Key="StudioAccentPurpleBrush" Color="#FFA78BFA" />
-            <SolidColorBrush x:Key="StudioAccentPurpleFillBrush" Color="#298B5CF6" />
+            <!-- Transparent sidebar reveals Mica Alt; translucent cards & workspace layers float cleanly above it -->
+            <SolidColorBrush x:Key="StudioSidebarBackgroundBrush" Color="#00000000" />
+            <SolidColorBrush x:Key="StudioSidebarCardFillBrush" Color="#0EFFFFFF" />
+            <SolidColorBrush x:Key="StudioWorkspaceCanvasBrush" Color="#0AFFFFFF" />
+            <SolidColorBrush x:Key="StudioWorkspaceCardFillBrush" Color="#0FFFFFFF" />
+            <SolidColorBrush x:Key="StudioLogHeaderBackgroundBrush" Color="#00000000" />
+            <SolidColorBrush x:Key="StudioLogPanelBackgroundBrush" Color="#0AFFFFFF" />
+            <SolidColorBrush x:Key="StudioLogTerminalFillBrush" Color="#FF111318" />
+            <SolidColorBrush x:Key="StudioSplitDividerBrush" Color="#15FFFFFF" />
+            <SolidColorBrush x:Key="StudioCardBorderBrush" Color="#14FFFFFF" />
+            <SolidColorBrush x:Key="StudioInputFillBrush" Color="#0CFFFFFF" />
+            <SolidColorBrush x:Key="StudioTextPrimaryBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="StudioTextSecondaryBrush" Color="#C5FFFFFF" />
+            <SolidColorBrush x:Key="StudioTextTertiaryBrush" Color="#8BFFFFFF" />
 
-            <!-- SwiftUI system colours (dark appearance) — used by Controls/ (StatusDot, cards, drop well) -->
-            <SolidColorBrush x:Key="StudioSystemAccentBrush" Color="#FF0A84FF" />
-            <SolidColorBrush x:Key="StudioSystemGreenBrush" Color="#FF30D158" />
-            <SolidColorBrush x:Key="StudioSystemOrangeBrush" Color="#FFFF9F0A" />
-            <SolidColorBrush x:Key="StudioSystemRedBrush" Color="#FFFF453A" />
-            <!-- `.secondary.opacity(0.45)` / `.secondary.opacity(0.5)` (idle status dots) -->
-            <SolidColorBrush x:Key="StudioSecondaryOpacity45Brush" Color="#3FFFFFFF" />
-            <SolidColorBrush x:Key="StudioSecondaryOpacity50Brush" Color="#46FFFFFF" />
-            <!-- `Color.primary.opacity(0.06)` (badge capsules) / `.opacity(0.32)` (hover crosshair) -->
+            <!-- Fluent 2 semantic accents (Dark) — primary accent follows Windows 11 system accent -->
+            <SolidColorBrush x:Key="StudioAccentBlueBrush" Color="{ThemeResource SystemAccentColorLight2}" />
+            <SolidColorBrush x:Key="StudioAccentBlueFillBrush" Color="{ThemeResource SystemAccentColorLight2}" Opacity="0.15" />
+            <SolidColorBrush x:Key="StudioAccentBlueBorderBrush" Color="{ThemeResource SystemAccentColorLight2}" Opacity="0.38" />
+            <SolidColorBrush x:Key="StudioAccentGreenBrush" Color="#FF6CCB5F" />
+            <SolidColorBrush x:Key="StudioAccentGreenFillBrush" Color="#226CCB5F" />
+            <SolidColorBrush x:Key="StudioAccentOrangeBrush" Color="#FFFCE100" />
+            <SolidColorBrush x:Key="StudioAccentOrangeFillBrush" Color="#22FCE100" />
+            <SolidColorBrush x:Key="StudioAccentRedBrush" Color="#FFFF99A4" />
+            <SolidColorBrush x:Key="StudioAccentRedFillBrush" Color="#24FF99A4" />
+            <SolidColorBrush x:Key="StudioAccentPurpleBrush" Color="#FFC49BFF" />
+            <SolidColorBrush x:Key="StudioAccentPurpleFillBrush" Color="#22C49BFF" />
+
+            <SolidColorBrush x:Key="StudioSystemAccentBrush" Color="{ThemeResource SystemAccentColorLight2}" />
+            <SolidColorBrush x:Key="StudioSystemGreenBrush" Color="#FF6CCB5F" />
+            <SolidColorBrush x:Key="StudioSystemOrangeBrush" Color="#FFFFB900" />
+            <SolidColorBrush x:Key="StudioSystemRedBrush" Color="#FFFF99A4" />
+            <SolidColorBrush x:Key="StudioSecondaryOpacity45Brush" Color="#44FFFFFF" />
+            <SolidColorBrush x:Key="StudioSecondaryOpacity50Brush" Color="#50FFFFFF" />
             <SolidColorBrush x:Key="StudioPrimaryOpacity06Brush" Color="#0FFFFFFF" />
             <SolidColorBrush x:Key="StudioPrimaryOpacity32Brush" Color="#52FFFFFF" />
-            <!-- Telemetry plots -->
-            <SolidColorBrush x:Key="StudioTelemetryPlotFillBrush" Color="#42000000" />
-            <SolidColorBrush x:Key="StudioTelemetryCombinedPlotFillBrush" Color="#47000000" />
-            <SolidColorBrush x:Key="StudioTelemetryGridLineBrush" Color="#13FFFFFF" />
+            <SolidColorBrush x:Key="StudioTelemetryPlotFillBrush" Color="#33000000" />
+            <SolidColorBrush x:Key="StudioTelemetryCombinedPlotFillBrush" Color="#38000000" />
+            <SolidColorBrush x:Key="StudioTelemetryGridLineBrush" Color="#14FFFFFF" />
         </ResourceDictionary>
-        <ResourceDictionary x:Key="Light">
-            <SolidColorBrush x:Key="StudioSidebarBackgroundBrush" Color="#FFF0F2F6" />
-            <SolidColorBrush x:Key="StudioSidebarCardFillBrush" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="StudioWorkspaceCanvasBrush" Color="#FFF7F8FA" />
-            <SolidColorBrush x:Key="StudioWorkspaceCardFillBrush" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="StudioLogHeaderBackgroundBrush" Color="#FFF2F4F7" />
-            <SolidColorBrush x:Key="StudioLogPanelBackgroundBrush" Color="#FFF3F5F8" />
-            <SolidColorBrush x:Key="StudioLogTerminalFillBrush" Color="#FF12151B" />
-            <SolidColorBrush x:Key="StudioSplitDividerBrush" Color="#FFDCE2EC" />
-            <SolidColorBrush x:Key="StudioCardBorderBrush" Color="#FFE2E7F0" />
-            <SolidColorBrush x:Key="StudioInputFillBrush" Color="#FFF8F9FC" />
-            <SolidColorBrush x:Key="StudioTextPrimaryBrush" Color="#FF0F172A" />
-            <SolidColorBrush x:Key="StudioTextSecondaryBrush" Color="#FF526074" />
-            <SolidColorBrush x:Key="StudioTextTertiaryBrush" Color="#FF94A3B8" />
-            <SolidColorBrush x:Key="StudioAccentBlueBrush" Color="#FF007AFF" />
-            <SolidColorBrush x:Key="StudioAccentBlueFillBrush" Color="#17007AFF" />
-            <SolidColorBrush x:Key="StudioAccentBlueBorderBrush" Color="#3D007AFF" />
-            <SolidColorBrush x:Key="StudioSurfaceButtonBrush" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="StudioSurfaceButtonHoverBrush" Color="#FFF1F5F9" />
-            <SolidColorBrush x:Key="StudioSurfaceButtonPressedBrush" Color="#FFE8EEF5" />
-            <SolidColorBrush x:Key="StudioPrimaryBtnBgBrush" Color="#FF007AFF" />
-            <SolidColorBrush x:Key="StudioPrimaryBtnHoverBrush" Color="#FF006AE0" />
-            <SolidColorBrush x:Key="StudioPrimaryBtnPressedBrush" Color="#FF005BC4" />
-            <SolidColorBrush x:Key="StudioPrimaryBtnDisabledBrush" Color="#78007AFF" />
-            <SolidColorBrush x:Key="StudioAccentGreenBrush" Color="#FF059669" />
-            <SolidColorBrush x:Key="StudioAccentGreenFillBrush" Color="#2410B981" />
-            <SolidColorBrush x:Key="StudioAccentOrangeBrush" Color="#FFD97706" />
-            <SolidColorBrush x:Key="StudioAccentOrangeFillBrush" Color="#24F59E0B" />
-            <SolidColorBrush x:Key="StudioAccentRedBrush" Color="#FFDC2626" />
-            <SolidColorBrush x:Key="StudioAccentRedFillBrush" Color="#24EF4444" />
-            <SolidColorBrush x:Key="StudioAccentPurpleBrush" Color="#FF7C3AED" />
-            <SolidColorBrush x:Key="StudioAccentPurpleFillBrush" Color="#248B5CF6" />
 
-            <!-- SwiftUI system colours (light appearance) -->
-            <SolidColorBrush x:Key="StudioSystemAccentBrush" Color="#FF007AFF" />
-            <SolidColorBrush x:Key="StudioSystemGreenBrush" Color="#FF34C759" />
-            <SolidColorBrush x:Key="StudioSystemOrangeBrush" Color="#FFFF9500" />
-            <SolidColorBrush x:Key="StudioSystemRedBrush" Color="#FFFF3B30" />
-            <SolidColorBrush x:Key="StudioSecondaryOpacity45Brush" Color="#39000000" />
-            <SolidColorBrush x:Key="StudioSecondaryOpacity50Brush" Color="#40000000" />
-            <SolidColorBrush x:Key="StudioPrimaryOpacity06Brush" Color="#0F000000" />
-            <SolidColorBrush x:Key="StudioPrimaryOpacity32Brush" Color="#52000000" />
-            <SolidColorBrush x:Key="StudioTelemetryPlotFillBrush" Color="#FFF5F7FB" />
-            <SolidColorBrush x:Key="StudioTelemetryCombinedPlotFillBrush" Color="#FFF5F7FB" />
-            <SolidColorBrush x:Key="StudioTelemetryGridLineBrush" Color="#11000000" />
+        <ResourceDictionary x:Key="Light">
+            <!-- Transparent sidebar reveals Mica Alt; translucent Fluent 2 layers float cleanly above it -->
+            <SolidColorBrush x:Key="StudioSidebarBackgroundBrush" Color="#00000000" />
+            <SolidColorBrush x:Key="StudioSidebarCardFillBrush" Color="#B3FFFFFF" />
+            <SolidColorBrush x:Key="StudioWorkspaceCanvasBrush" Color="#80FFFFFF" />
+            <SolidColorBrush x:Key="StudioWorkspaceCardFillBrush" Color="#D9FFFFFF" />
+            <SolidColorBrush x:Key="StudioLogHeaderBackgroundBrush" Color="#00000000" />
+            <SolidColorBrush x:Key="StudioLogPanelBackgroundBrush" Color="#80FFFFFF" />
+            <SolidColorBrush x:Key="StudioLogTerminalFillBrush" Color="#FF13161C" />
+            <SolidColorBrush x:Key="StudioSplitDividerBrush" Color="#0F000000" />
+            <SolidColorBrush x:Key="StudioCardBorderBrush" Color="#0F000000" />
+            <SolidColorBrush x:Key="StudioInputFillBrush" Color="#8CFFFFFF" />
+            <SolidColorBrush x:Key="StudioTextPrimaryBrush" Color="#E4000000" />
+            <SolidColorBrush x:Key="StudioTextSecondaryBrush" Color="#9E000000" />
+            <SolidColorBrush x:Key="StudioTextTertiaryBrush" Color="#72000000" />
+
+            <!-- Fluent 2 semantic accents (Light) — primary accent follows Windows 11 system accent -->
+            <SolidColorBrush x:Key="StudioAccentBlueBrush" Color="{ThemeResource SystemAccentColorDark1}" />
+            <SolidColorBrush x:Key="StudioAccentBlueFillBrush" Color="{ThemeResource SystemAccentColorDark1}" Opacity="0.11" />
+            <SolidColorBrush x:Key="StudioAccentBlueBorderBrush" Color="{ThemeResource SystemAccentColorDark1}" Opacity="0.32" />
+            <SolidColorBrush x:Key="StudioAccentGreenBrush" Color="#FF0F7B0F" />
+            <SolidColorBrush x:Key="StudioAccentGreenFillBrush" Color="#180F7B0F" />
+            <SolidColorBrush x:Key="StudioAccentOrangeBrush" Color="#FF9D5D00" />
+            <SolidColorBrush x:Key="StudioAccentOrangeFillBrush" Color="#1A9D5D00" />
+            <SolidColorBrush x:Key="StudioAccentRedBrush" Color="#FFC42B1C" />
+            <SolidColorBrush x:Key="StudioAccentRedFillBrush" Color="#18C42B1C" />
+            <SolidColorBrush x:Key="StudioAccentPurpleBrush" Color="#FF6B38B8" />
+            <SolidColorBrush x:Key="StudioAccentPurpleFillBrush" Color="#186B38B8" />
+
+            <SolidColorBrush x:Key="StudioSystemAccentBrush" Color="{ThemeResource SystemAccentColorDark1}" />
+            <SolidColorBrush x:Key="StudioSystemGreenBrush" Color="#FF0F7B0F" />
+            <SolidColorBrush x:Key="StudioSystemOrangeBrush" Color="#FF9D5D00" />
+            <SolidColorBrush x:Key="StudioSystemRedBrush" Color="#FFC42B1C" />
+            <SolidColorBrush x:Key="StudioSecondaryOpacity45Brush" Color="#40000000" />
+            <SolidColorBrush x:Key="StudioSecondaryOpacity50Brush" Color="#48000000" />
+            <SolidColorBrush x:Key="StudioPrimaryOpacity06Brush" Color="#0A000000" />
+            <SolidColorBrush x:Key="StudioPrimaryOpacity32Brush" Color="#48000000" />
+            <SolidColorBrush x:Key="StudioTelemetryPlotFillBrush" Color="#70FFFFFF" />
+            <SolidColorBrush x:Key="StudioTelemetryCombinedPlotFillBrush" Color="#70FFFFFF" />
+            <SolidColorBrush x:Key="StudioTelemetryGridLineBrush" Color="#0F000000" />
         </ResourceDictionary>
     </ResourceDictionary.ThemeDictionaries>
 
     <!-- Terminal text is always light (terminal fill is dark in both themes) -->
-    <SolidColorBrush x:Key="StudioTerminalTextBrush" Color="#FFCBD5E1" />
+    <SolidColorBrush x:Key="StudioTerminalTextBrush" Color="#FFD4D8E0" />
     <FontFamily x:Key="StudioMonoFont">Cascadia Mono, Consolas, Courier New</FontFamily>
 
     <!-- Allow compact 28px inputs without clipping the bottom border of TextBox/PasswordBox -->
     <x:Double x:Key="TextControlThemeMinHeight">26</x:Double>
     <Thickness x:Key="TextControlThemePadding">8,4,8,4</Thickness>
 
-    <!-- Shared card container style: macOS SidebarCard / WorkspaceCard equivalent -->
+    <!-- Shared card container styles (Fluent 2 8px radius, crisp 1px CardStroke) -->
     <Style x:Key="StudioSidebarCardStyle" TargetType="Border">
         <Setter Property="Background" Value="{ThemeResource StudioSidebarCardFillBrush}" />
         <Setter Property="BorderBrush" Value="{ThemeResource StudioCardBorderBrush}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="CornerRadius" Value="8" />
         <Setter Property="Padding" Value="12" />
     </Style>
     <Style x:Key="StudioWorkspaceCardStyle" TargetType="Border">
         <Setter Property="Background" Value="{ThemeResource StudioWorkspaceCardFillBrush}" />
         <Setter Property="BorderBrush" Value="{ThemeResource StudioCardBorderBrush}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="CornerRadius" Value="8" />
         <Setter Property="Padding" Value="16" />
     </Style>
     <Style x:Key="StudioCaptionTextStyle" TargetType="TextBlock">
@@ -136,12 +124,12 @@
         <Setter Property="TextWrapping" Value="Wrap" />
     </Style>
     <Style x:Key="StudioSectionTitleStyle" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontSize" Value="13.5" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Foreground" Value="{ThemeResource StudioTextPrimaryBrush}" />
     </Style>
 
-    <!-- SwiftUI `.buttonStyle(.plain)`: content only, no chrome / hover plate -->
+    <!-- Plain button: content only, no chrome (used by interactive card rows) -->
     <Style x:Key="StudioPlainButtonStyle" TargetType="Button">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
@@ -166,83 +154,39 @@
         </Setter>
     </Style>
 
-    <!-- EasyColab Primary Action Button (brand blue in both enabled and soft-disabled states) -->
-    <Style x:Key="StudioPrimaryButtonStyle" TargetType="Button">
-        <Setter Property="Background" Value="{ThemeResource StudioPrimaryBtnBgBrush}" />
-        <Setter Property="Foreground" Value="#FFFFFFFF" />
-        <Setter Property="BorderBrush" Value="Transparent" />
-        <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="CornerRadius" Value="8" />
-        <Setter Property="Padding" Value="12,6" />
+    <!-- Native WinUI 3 Fluent 2 Accent Button (follows Windows 11 system accent & elevation) -->
+    <Style x:Key="StudioPrimaryButtonStyle" TargetType="Button" BasedOn="{StaticResource AccentButtonStyle}">
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="12,5" />
         <Setter Property="MinHeight" Value="30" />
         <Setter Property="MinWidth" Value="0" />
         <Setter Property="FontSize" Value="12" />
         <Setter Property="FontWeight" Value="SemiBold" />
-        <Setter Property="HorizontalContentAlignment" Value="Center" />
-        <Setter Property="VerticalContentAlignment" Value="Center" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Border
-                        x:Name="RootBorder"
-                        Padding="{TemplateBinding Padding}"
-                        Background="{TemplateBinding Background}"
-                        BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{TemplateBinding BorderThickness}"
-                        CornerRadius="{TemplateBinding CornerRadius}">
-                        <VisualStateManager.VisualStateGroups>
-                            <VisualStateGroup x:Name="CommonStates">
-                                <VisualState x:Name="Normal" />
-                                <VisualState x:Name="PointerOver">
-                                    <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="RootBorder" Storyboard.TargetProperty="Background">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource StudioPrimaryBtnHoverBrush}" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                    </Storyboard>
-                                </VisualState>
-                                <VisualState x:Name="Pressed">
-                                    <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="RootBorder" Storyboard.TargetProperty="Background">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource StudioPrimaryBtnPressedBrush}" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                    </Storyboard>
-                                </VisualState>
-                                <VisualState x:Name="Disabled">
-                                    <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="RootBorder" Storyboard.TargetProperty="Background">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource StudioPrimaryBtnDisabledBrush}" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <DoubleAnimation Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Opacity" To="0.92" Duration="0" />
-                                    </Storyboard>
-                                </VisualState>
-                            </VisualStateGroup>
-                        </VisualStateManager.VisualStateGroups>
-                        <ContentPresenter
-                            x:Name="ContentPresenter"
-                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                            Content="{TemplateBinding Content}"
-                            ContentTemplate="{TemplateBinding ContentTemplate}"
-                            ContentTransitions="{TemplateBinding ContentTransitions}"
-                            Foreground="{TemplateBinding Foreground}" />
-                    </Border>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
     </Style>
 
-    <!-- Subtle macOS-like surface button with crisp 1px border and clean hover state -->
-    <Style x:Key="StudioSurfaceButtonStyle" TargetType="Button">
-        <Setter Property="Background" Value="{ThemeResource StudioSurfaceButtonBrush}" />
-        <Setter Property="Foreground" Value="{ThemeResource StudioTextPrimaryBrush}" />
-        <Setter Property="BorderBrush" Value="{ThemeResource StudioCardBorderBrush}" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="CornerRadius" Value="6" />
-        <Setter Property="Padding" Value="9,0" />
-        <Setter Property="MinHeight" Value="26" />
+    <!-- Native WinUI 3 Fluent 2 Standard Button (preserves ControlElevationBorderBrush & Fluent animations) -->
+    <Style x:Key="StudioSurfaceButtonStyle" TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+        <Setter Property="CornerRadius" Value="5" />
+        <Setter Property="Padding" Value="10,4" />
+        <Setter Property="MinHeight" Value="28" />
         <Setter Property="MinWidth" Value="0" />
-        <Setter Property="FontSize" Value="11.5" />
-        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontWeight" Value="Normal" />
+    </Style>
+
+    <!-- Native WinUI 3 Subtle TitleBar / Toolbar Button (transparent at rest, Fluent subtle plate on hover) -->
+    <Style x:Key="StudioTitleBarButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="CornerRadius" Value="5" />
+        <Setter Property="Padding" Value="9,0" />
+        <Setter Property="Height" Value="30" />
+        <Setter Property="MinWidth" Value="30" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Template">
@@ -261,20 +205,20 @@
                                 <VisualState x:Name="PointerOver">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="RootBorder" Storyboard.TargetProperty="Background">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource StudioSurfaceButtonHoverBrush}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SubtleFillColorSecondaryBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="Pressed">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="RootBorder" Storyboard.TargetProperty="Background">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource StudioSurfaceButtonPressedBrush}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SubtleFillColorTertiaryBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="Disabled">
                                     <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetName="RootBorder" Storyboard.TargetProperty="Opacity" To="0.45" Duration="0" />
+                                        <DoubleAnimation Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Opacity" To="0.4" Duration="0" />
                                     </Storyboard>
                                 </VisualState>
                             </VisualStateGroup>
@@ -293,160 +237,152 @@
         </Setter>
     </Style>
 
-    <!-- Controls/Cards.cs: SidebarCard (Swift SidebarCard) -->
+    <!-- Controls/Cards.cs: SidebarCard (Fluent 2 translucent card floating on Mica) -->
     <Style TargetType="controls:SidebarCard">
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="VerticalContentAlignment" Value="Top" />
-        <Setter Property="Padding" Value="13" />
+        <Setter Property="Padding" Value="14,12,14,14" />
         <Setter Property="Background" Value="{ThemeResource StudioSidebarCardFillBrush}" />
         <Setter Property="BorderBrush" Value="{ThemeResource StudioCardBorderBrush}" />
-        <Setter Property="BorderThickness" Value="0.8" />
-        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="8" />
         <Setter Property="IsTabStop" Value="False" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="controls:SidebarCard">
-                    <Grid>
-                        <Border x:Name="ShadowHost" CornerRadius="{TemplateBinding CornerRadius}" />
-                        <Border
-                            Padding="{TemplateBinding Padding}"
-                            Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="{TemplateBinding CornerRadius}">
-                            <Grid RowSpacing="11">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="*" />
-                                </Grid.RowDefinitions>
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <FontIcon
-                                        Margin="0,0,6,0"
-                                        VerticalAlignment="Center"
-                                        FontSize="12"
-                                        FontWeight="SemiBold"
-                                        Foreground="{ThemeResource StudioSystemAccentBrush}"
-                                        Glyph="{TemplateBinding Icon}" />
+                    <Border
+                        Padding="{TemplateBinding Padding}"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}">
+                        <Grid RowSpacing="10">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <FontIcon
+                                    Margin="0,0,7,0"
+                                    VerticalAlignment="Center"
+                                    FontSize="13"
+                                    Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                    Glyph="{TemplateBinding Icon}" />
+                                <TextBlock
+                                    Grid.Column="1"
+                                    VerticalAlignment="Center"
+                                    FontSize="13"
+                                    FontWeight="SemiBold"
+                                    Foreground="{ThemeResource StudioTextPrimaryBrush}"
+                                    Text="{TemplateBinding Title}"
+                                    TextTrimming="CharacterEllipsis" />
+                                <Border
+                                    x:Name="BadgeCapsule"
+                                    Grid.Column="2"
+                                    Margin="6,0,0,0"
+                                    Padding="7,2"
+                                    VerticalAlignment="Center"
+                                    Background="{ThemeResource SubtleFillColorSecondaryBrush}"
+                                    CornerRadius="4"
+                                    Visibility="Collapsed">
                                     <TextBlock
-                                        Grid.Column="1"
-                                        VerticalAlignment="Center"
-                                        FontSize="12.5"
-                                        FontWeight="Bold"
-                                        Foreground="{ThemeResource StudioTextPrimaryBrush}"
-                                        Text="{TemplateBinding Title}"
-                                        TextTrimming="CharacterEllipsis" />
-                                    <Border
-                                        x:Name="BadgeCapsule"
-                                        Grid.Column="2"
-                                        Margin="6,0,0,0"
-                                        Padding="7,2"
-                                        VerticalAlignment="Center"
-                                        Background="{ThemeResource StudioPrimaryOpacity06Brush}"
-                                        CornerRadius="6"
-                                        Visibility="Collapsed">
-                                        <TextBlock
-                                            FontSize="10.5"
-                                            FontWeight="Medium"
-                                            Foreground="{ThemeResource StudioTextSecondaryBrush}"
-                                            Text="{TemplateBinding Badge}" />
-                                    </Border>
-                                </Grid>
-                                <ContentPresenter
-                                    Grid.Row="1"
-                                    HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                    VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                                    Content="{TemplateBinding Content}"
-                                    ContentTemplate="{TemplateBinding ContentTemplate}"
-                                    ContentTransitions="{TemplateBinding ContentTransitions}" />
+                                        FontSize="10.5"
+                                        FontWeight="SemiBold"
+                                        Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                        Text="{TemplateBinding Badge}" />
+                                </Border>
                             </Grid>
-                        </Border>
-                    </Grid>
+                            <ContentPresenter
+                                Grid.Row="1"
+                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                Content="{TemplateBinding Content}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                ContentTransitions="{TemplateBinding ContentTransitions}" />
+                        </Grid>
+                    </Border>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
 
-    <!-- Controls/Cards.cs: WorkspaceCard (Swift WorkspaceCard) -->
+    <!-- Controls/Cards.cs: WorkspaceCard (Fluent 2 elevated card inside workspace layer) -->
     <Style TargetType="controls:WorkspaceCard">
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="VerticalContentAlignment" Value="Top" />
-        <Setter Property="Padding" Value="16" />
+        <Setter Property="Padding" Value="16,14,16,16" />
         <Setter Property="Background" Value="{ThemeResource StudioWorkspaceCardFillBrush}" />
         <Setter Property="BorderBrush" Value="{ThemeResource StudioCardBorderBrush}" />
-        <Setter Property="BorderThickness" Value="0.8" />
-        <Setter Property="CornerRadius" Value="11" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="8" />
         <Setter Property="IsTabStop" Value="False" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="controls:WorkspaceCard">
-                    <Grid>
-                        <Border x:Name="ShadowHost" CornerRadius="{TemplateBinding CornerRadius}" />
-                        <Border
-                            Padding="{TemplateBinding Padding}"
-                            Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="{TemplateBinding CornerRadius}">
-                            <Grid RowSpacing="12">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="*" />
-                                </Grid.RowDefinitions>
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <FontIcon
-                                        x:Name="IconGlyph"
-                                        Margin="0,0,8,0"
-                                        VerticalAlignment="Center"
-                                        FontSize="13"
+                    <Border
+                        Padding="{TemplateBinding Padding}"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}">
+                        <Grid RowSpacing="12">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <FontIcon
+                                    x:Name="IconGlyph"
+                                    Margin="0,0,8,0"
+                                    VerticalAlignment="Center"
+                                    FontSize="13.5"
+                                    Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                    Glyph="{TemplateBinding Icon}"
+                                    Visibility="Collapsed" />
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                                    <TextBlock
+                                        FontSize="13.5"
                                         FontWeight="SemiBold"
-                                        Foreground="{ThemeResource StudioSystemAccentBrush}"
-                                        Glyph="{TemplateBinding Icon}"
+                                        Foreground="{ThemeResource StudioTextPrimaryBrush}"
+                                        Text="{TemplateBinding Title}"
+                                        TextWrapping="Wrap" />
+                                    <TextBlock
+                                        x:Name="SubtitleText"
+                                        FontSize="11"
+                                        Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                        Text="{TemplateBinding Subtitle}"
+                                        TextWrapping="Wrap"
                                         Visibility="Collapsed" />
-                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
-                                        <TextBlock
-                                            FontSize="13"
-                                            FontWeight="SemiBold"
-                                            Foreground="{ThemeResource StudioTextPrimaryBrush}"
-                                            Text="{TemplateBinding Title}"
-                                            TextWrapping="Wrap" />
-                                        <TextBlock
-                                            x:Name="SubtitleText"
-                                            FontSize="10"
-                                            Foreground="{ThemeResource StudioTextSecondaryBrush}"
-                                            Text="{TemplateBinding Subtitle}"
-                                            TextWrapping="Wrap"
-                                            Visibility="Collapsed" />
-                                    </StackPanel>
-                                    <ContentPresenter
-                                        x:Name="TrailingPresenter"
-                                        Grid.Column="2"
-                                        Margin="8,0,0,0"
-                                        VerticalAlignment="Center"
-                                        Content="{TemplateBinding Trailing}"
-                                        Visibility="Collapsed" />
-                                </Grid>
+                                </StackPanel>
                                 <ContentPresenter
-                                    Grid.Row="1"
-                                    HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                    VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                                    Content="{TemplateBinding Content}"
-                                    ContentTemplate="{TemplateBinding ContentTemplate}"
-                                    ContentTransitions="{TemplateBinding ContentTransitions}" />
+                                    x:Name="TrailingPresenter"
+                                    Grid.Column="2"
+                                    Margin="8,0,0,0"
+                                    VerticalAlignment="Center"
+                                    Content="{TemplateBinding Trailing}"
+                                    Visibility="Collapsed" />
                             </Grid>
-                        </Border>
-                    </Grid>
+                            <ContentPresenter
+                                Grid.Row="1"
+                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                Content="{TemplateBinding Content}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                ContentTransitions="{TemplateBinding ContentTransitions}" />
+                        </Grid>
+                    </Border>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

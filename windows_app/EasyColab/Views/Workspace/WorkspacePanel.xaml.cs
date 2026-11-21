@@ -240,8 +240,8 @@ public sealed partial class WorkspacePanel : UserControl
 
             var cardBorder = new Border
             {
-                Padding = new Thickness(12),
-                CornerRadius = new CornerRadius(10),
+                Padding = new Thickness(12, 10, 12, 10),
+                CornerRadius = new CornerRadius(6),
                 Child = innerGrid,
             };
 
@@ -270,10 +270,11 @@ public sealed partial class WorkspacePanel : UserControl
     {
         var theme = ActualTheme;
         bool isDark = theme == ElementTheme.Dark;
-        var accent = EasyColab.Controls.StudioColors.SystemAccent(theme);
+        var accent = EasyColab.Controls.StudioColors.ResolveThemeColor(
+            "StudioSystemAccentBrush", theme, EasyColab.Controls.StudioColors.SystemAccent(theme));
         var accentBrush = new SolidColorBrush(accent);
-        var accentSelectedFill = new SolidColorBrush(EasyColab.Controls.StudioColors.WithOpacity(accent, isDark ? 0.16 : 0.07));
-        var accentBadgeFill = new SolidColorBrush(EasyColab.Controls.StudioColors.WithOpacity(accent, 0.14));
+        var accentSelectedFill = new SolidColorBrush(EasyColab.Controls.StudioColors.WithOpacity(accent, isDark ? 0.14 : 0.06));
+        var accentBadgeFill = new SolidColorBrush(EasyColab.Controls.StudioColors.WithOpacity(accent, isDark ? 0.20 : 0.12));
         var whiteBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(0xFF, 0xFF, 0xFF, 0xFF));
 
         var inputFillBrush = new SolidColorBrush(EasyColab.Controls.StudioColors.ResolveThemeColor(
@@ -296,9 +297,9 @@ public sealed partial class WorkspacePanel : UserControl
 
             card.CardBorder.Background = selected ? accentSelectedFill : inputFillBrush;
             card.CardBorder.BorderBrush = selected
-                ? new SolidColorBrush(EasyColab.Controls.StudioColors.WithOpacity(accent, isDark ? 0.65 : 0.55))
+                ? new SolidColorBrush(EasyColab.Controls.StudioColors.WithOpacity(accent, isDark ? 0.55 : 0.45))
                 : borderBrush;
-            card.CardBorder.BorderThickness = new Thickness(selected ? 1.25 : 0.8);
+            card.CardBorder.BorderThickness = new Thickness(1);
 
             card.IconBox.Background = selected ? accentBrush : subtleFillBrush;
             card.IconGlyph.Foreground = selected ? whiteBrush : secondaryTextBrush;

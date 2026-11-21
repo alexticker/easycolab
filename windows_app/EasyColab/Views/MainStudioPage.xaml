@@ -9,56 +9,37 @@
     xmlns:views="using:EasyColab.Views"
     xmlns:ws="using:EasyColab.Views.Workspace">
 
-    <UserControl.Resources>
-        <Style x:Key="HeaderToolButtonStyle" TargetType="Button" BasedOn="{StaticResource StudioSurfaceButtonStyle}">
-            <Setter Property="Height" Value="26" />
-            <Setter Property="Padding" Value="9,0" />
-            <Setter Property="FontSize" Value="11.5" />
-            <Setter Property="CornerRadius" Value="6" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-        </Style>
+    <Grid x:Name="PageRoot" Background="Transparent">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="48" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
-        <Style x:Key="HeaderIconButtonStyle" TargetType="Button" BasedOn="{StaticResource StudioPlainButtonStyle}">
-            <Setter Property="Padding" Value="5,4" />
-            <Setter Property="MinHeight" Value="26" />
-            <Setter Property="MinWidth" Value="26" />
-            <Setter Property="CornerRadius" Value="6" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-        </Style>
-    </UserControl.Resources>
-
-    <Grid x:Name="PageRoot">
-        <!-- Main 3-Column Shell -->
-        <Grid x:Name="ShellGrid">
+        <!-- Unified Windows 11 Mica Title Bar (48px tall) -->
+        <Grid
+            Grid.Row="0"
+            Padding="14,0,0,0"
+            Background="Transparent"
+            ColumnSpacing="4">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="356" />
-                <ColumnDefinition Width="1" />
-                <ColumnDefinition Width="*" MinWidth="540" />
+                <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition x:Name="TitleBarCaptionSpacer" Width="138" />
             </Grid.ColumnDefinitions>
 
-            <!-- 1. Left Sidebar Column (full height from y=0) -->
-            <Grid Grid.Column="0" Background="{ThemeResource StudioSidebarBackgroundBrush}">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="40" />
-                    <RowDefinition Height="1" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-
-                <!-- sidebarTopHeader -->
-                <Grid Grid.Row="0" Padding="14,0,12,0" ColumnSpacing="6">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-
+            <!-- Dedicated Draggable Title Bar Region: App Icon + Title + Live Telemetry Status -->
+            <Border
+                x:Name="TitleBarDragRegion"
+                Grid.Column="0"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                Background="Transparent">
+                <StackPanel
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal"
+                    Spacing="10">
                     <!-- EasyColab 20x20 Cloud + Spark Vector Brand Icon -->
                     <Grid
-                        Grid.Column="0"
                         Width="20"
                         Height="20"
                         VerticalAlignment="Center">
@@ -84,290 +65,269 @@
                     </Grid>
 
                     <TextBlock
-                        Grid.Column="1"
                         VerticalAlignment="Center"
-                        FontSize="13.5"
-                        FontWeight="Bold"
+                        FontSize="13"
+                        FontWeight="SemiBold"
                         Foreground="{ThemeResource StudioTextPrimaryBrush}"
                         Text="EasyColab" />
 
-                    <!-- Language Switch Pill -->
-                    <Button
-                        x:Name="LanguageToggleButton"
-                        Grid.Column="3"
-                        Height="23"
-                        Padding="8,0"
-                        VerticalAlignment="Center"
-                        Background="{ThemeResource StudioSurfaceButtonBrush}"
-                        BorderBrush="{ThemeResource StudioCardBorderBrush}"
-                        BorderThickness="1"
-                        Click="LanguageToggleButton_Click"
-                        CornerRadius="11.5"
-                        Style="{StaticResource StudioSurfaceButtonStyle}">
-                        <StackPanel VerticalAlignment="Center" Orientation="Horizontal" Spacing="4">
-                            <FontIcon
-                                FontSize="10"
-                                Foreground="{ThemeResource StudioTextSecondaryBrush}"
-                                Glyph="&#xE774;" />
-                            <TextBlock
-                                x:Name="LanguageToggleLabel"
-                                VerticalAlignment="Center"
-                                FontSize="11"
-                                FontWeight="SemiBold"
-                                Foreground="{ThemeResource StudioTextPrimaryBrush}" />
-                        </StackPanel>
-                    </Button>
-
-                    <!-- Onboarding Guide Pill -->
-                    <Button
-                        Grid.Column="4"
-                        Height="23"
-                        Padding="9,0"
-                        VerticalAlignment="Center"
-                        Background="{ThemeResource StudioAccentBlueFillBrush}"
-                        BorderBrush="{ThemeResource StudioAccentBlueBorderBrush}"
-                        BorderThickness="1"
-                        Click="OpenGuideButton_Click"
-                        CornerRadius="11.5"
-                        Style="{StaticResource StudioSurfaceButtonStyle}"
-                        ToolTipService.ToolTip="{loc:L Zh='查看 EasyColab 新手入门引导与分步使用教程', En='Open EasyColab quick start guide &amp; walkthrough'}">
-                        <StackPanel VerticalAlignment="Center" Orientation="Horizontal" Spacing="4">
-                            <FontIcon
-                                FontSize="10"
-                                Foreground="{ThemeResource StudioSystemAccentBrush}"
-                                Glyph="&#xE734;" />
-                            <TextBlock
-                                VerticalAlignment="Center"
-                                FontSize="11"
-                                FontWeight="SemiBold"
-                                Foreground="{ThemeResource StudioSystemAccentBrush}"
-                                Text="{loc:L Zh='新手引导', En='Guide'}" />
-                        </StackPanel>
-                    </Button>
-                </Grid>
-
-                <Border Grid.Row="1" Background="{ThemeResource StudioSplitDividerBrush}" />
-
-                <views:SidebarPanel x:Name="LeftSidebarPanel" Grid.Row="2" />
-            </Grid>
-
-            <!-- Left-Center Full-Height 1px Divider -->
-            <Border Grid.Column="1" Background="{ThemeResource StudioSplitDividerBrush}" />
-
-            <!-- 2. Center Main Workspace Column (full height from y=0) -->
-            <Grid Grid.Column="2" Background="{ThemeResource StudioWorkspaceCanvasBrush}">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="40" />
-                    <RowDefinition Height="1" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-
-                <!-- workspaceTopHeader -->
-                <Grid
-                    Grid.Row="0"
-                    Padding="18,0,14,0"
-                    Background="{ThemeResource StudioWorkspaceCardFillBrush}"
-                    ColumnSpacing="8">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition x:Name="WorkspaceHeaderCaptionSpacer" Width="0" />
-                    </Grid.ColumnDefinitions>
-
-                    <!-- Dedicated Window Title Bar Drag Region (non-interactive status + stretch spacer) -->
                     <Border
-                        x:Name="TitleBarDragRegion"
-                        Grid.Column="0"
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Stretch"
-                        Background="Transparent">
-                        <StackPanel
-                            VerticalAlignment="Center"
-                            Orientation="Horizontal"
-                            Spacing="6">
-                            <c:StatusDot
-                                x:Name="HeaderConnectionDot"
-                                Color="{ThemeResource StudioSecondaryOpacity45Brush}" />
-                            <TextBlock
-                                x:Name="HeaderTelemetryText"
-                                FontSize="12"
-                                FontWeight="Medium"
-                                Foreground="{ThemeResource StudioTextSecondaryBrush}"
-                                TextTrimming="CharacterEllipsis" />
-                        </StackPanel>
-                    </Border>
+                        Width="1"
+                        Height="14"
+                        Margin="2,0"
+                        VerticalAlignment="Center"
+                        Background="{ThemeResource StudioSplitDividerBrush}" />
 
-                    <!-- Interactive Workspace Header Actions -->
+                    <!-- Live Status Pill (subtle, non-intrusive) -->
                     <StackPanel
-                        Grid.Column="1"
                         VerticalAlignment="Center"
                         Orientation="Horizontal"
                         Spacing="6">
-
-                        <!-- Prompt Templates Menu -->
-                        <Button
-                            Style="{StaticResource HeaderToolButtonStyle}"
-                            ToolTipService.ToolTip="{loc:L Zh='填入当前模型精选提示词模板', En='Insert curated prompt templates for the active model'}">
-                            <StackPanel Orientation="Horizontal" Spacing="5">
-                                <FontIcon FontSize="11.5" Glyph="&#xE8FD;" />
-                                <TextBlock FontSize="11.5" FontWeight="Medium" Text="{loc:L Zh='示例模板', En='Templates'}" />
-                                <FontIcon FontSize="8.5" Glyph="&#xE70D;" Opacity="0.7" />
-                            </StackPanel>
-                            <Button.Flyout>
-                                <MenuFlyout x:Name="TemplatesMenuFlyout" Opening="TemplatesMenuFlyout_Opening" Placement="BottomEdgeAlignedLeft" />
-                            </Button.Flyout>
-                        </Button>
-
-                        <!-- Local Output Folder -->
-                        <Button
-                            Click="OpenOutputFolderButton_Click"
-                            Style="{StaticResource HeaderToolButtonStyle}"
-                            ToolTipService.ToolTip="{loc:L Zh='打开本地保存的视频与图像文件夹', En='Open local folder for saved videos &amp; images'}">
-                            <StackPanel Orientation="Horizontal" Spacing="5">
-                                <FontIcon FontSize="11.5" Glyph="&#xE8B7;" />
-                                <TextBlock FontSize="11.5" FontWeight="Medium" Text="{loc:L Zh='本地输出目录', En='Output Folder'}" />
-                            </StackPanel>
-                        </Button>
-
-                        <!-- User Guide -->
-                        <Button
-                            Click="OpenGuideButton_Click"
-                            Style="{StaticResource HeaderToolButtonStyle}"
-                            ToolTipService.ToolTip="{loc:L Zh='重新打开新手引导页与完整使用指南', En='Reopen the interactive onboarding &amp; user guide'}">
-                            <StackPanel Orientation="Horizontal" Spacing="5">
-                                <FontIcon FontSize="11.5" Glyph="&#xE82D;" />
-                                <TextBlock FontSize="11.5" FontWeight="Medium" Text="{loc:L Zh='使用指南', En='User Guide'}" />
-                            </StackPanel>
-                        </Button>
-
-                        <!-- Toggle Right Log Panel -->
-                        <Button
-                            x:Name="ToggleLogPanelButton"
-                            Click="ToggleLogPanelButton_Click"
-                            Style="{StaticResource HeaderIconButtonStyle}">
-                            <FontIcon
-                                x:Name="ToggleLogPanelIcon"
-                                FontSize="13"
-                                Foreground="{ThemeResource StudioSystemAccentBrush}"
-                                Glyph="&#xE90C;" />
-                        </Button>
+                        <c:StatusDot
+                            x:Name="HeaderConnectionDot"
+                            Color="{ThemeResource StudioSecondaryOpacity45Brush}" />
+                        <TextBlock
+                            x:Name="HeaderTelemetryText"
+                            MaxWidth="460"
+                            VerticalAlignment="Center"
+                            FontSize="12"
+                            Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                            TextTrimming="CharacterEllipsis" />
                     </StackPanel>
-                </Grid>
+                </StackPanel>
+            </Border>
 
-                <Border Grid.Row="1" Background="{ThemeResource StudioSplitDividerBrush}" />
+            <!-- Unified Borderless Fluent 2 Title Bar Actions -->
+            <StackPanel
+                Grid.Column="1"
+                Margin="0,0,8,0"
+                VerticalAlignment="Center"
+                Orientation="Horizontal"
+                Spacing="2">
 
-                <!-- Center Workspace Panel (owned by parallel agent) -->
-                <ws:WorkspacePanel x:Name="CenterWorkspacePanel" Grid.Row="2" />
-            </Grid>
+                <!-- Prompt Templates Menu -->
+                <Button
+                    Style="{StaticResource StudioTitleBarButtonStyle}"
+                    ToolTipService.ToolTip="{loc:L Zh='填入当前模型精选提示词模板', En='Insert curated prompt templates for the active model'}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <FontIcon FontSize="12.5" Glyph="&#xE8FD;" />
+                        <TextBlock FontSize="12" Text="{loc:L Zh='模板', En='Templates'}" />
+                        <FontIcon FontSize="8.5" Glyph="&#xE70D;" Opacity="0.65" />
+                    </StackPanel>
+                    <Button.Flyout>
+                        <MenuFlyout x:Name="TemplatesMenuFlyout" Opening="TemplatesMenuFlyout_Opening" Placement="BottomEdgeAlignedLeft" />
+                    </Button.Flyout>
+                </Button>
 
-            <!-- Center-Right Full-Height 1px Divider -->
-            <Border
-                x:Name="RightColumnDivider"
-                Grid.Column="3"
-                Width="1"
-                Background="{ThemeResource StudioSplitDividerBrush}" />
+                <!-- Local Output Folder -->
+                <Button
+                    Click="OpenOutputFolderButton_Click"
+                    Style="{StaticResource StudioTitleBarButtonStyle}"
+                    ToolTipService.ToolTip="{loc:L Zh='打开本地保存的视频与图像文件夹', En='Open local folder for saved videos &amp; images'}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <FontIcon FontSize="12.5" Glyph="&#xE8B7;" />
+                        <TextBlock FontSize="12" Text="{loc:L Zh='输出目录', En='Outputs'}" />
+                    </StackPanel>
+                </Button>
 
-            <!-- 3. Right Collapsible Run Log Column (full height from y=0) -->
-            <Grid
-                x:Name="RightLogColumnHost"
-                Grid.Column="4"
-                Width="352"
-                Background="{ThemeResource StudioLogPanelBackgroundBrush}">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="40" />
-                    <RowDefinition Height="1" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
+                <!-- Onboarding Guide -->
+                <Button
+                    Click="OpenGuideButton_Click"
+                    Style="{StaticResource StudioTitleBarButtonStyle}"
+                    ToolTipService.ToolTip="{loc:L Zh='打开 EasyColab 新手引导与使用指南 (F1)', En='Open EasyColab quick start &amp; user guide (F1)'}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <FontIcon
+                            FontSize="12.5"
+                            Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                            Glyph="&#xE82D;" />
+                        <TextBlock FontSize="12" Text="{loc:L Zh='引导', En='Guide'}" />
+                    </StackPanel>
+                </Button>
 
-                <!-- logPanelTopHeader -->
-                <Grid
-                    Grid.Row="0"
-                    Padding="10,0,2,0"
-                    Background="{ThemeResource StudioLogHeaderBackgroundBrush}"
-                    ColumnSpacing="4">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition x:Name="LogHeaderCaptionSpacer" Width="138" />
-                    </Grid.ColumnDefinitions>
+                <Border
+                    Width="1"
+                    Height="14"
+                    Margin="4,0"
+                    VerticalAlignment="Center"
+                    Background="{ThemeResource StudioSplitDividerBrush}" />
 
+                <!-- Language Switch -->
+                <Button
+                    x:Name="LanguageToggleButton"
+                    Click="LanguageToggleButton_Click"
+                    Style="{StaticResource StudioTitleBarButtonStyle}">
+                    <StackPanel Orientation="Horizontal" Spacing="5">
+                        <FontIcon FontSize="12" Glyph="&#xE774;" />
+                        <TextBlock
+                            x:Name="LanguageToggleLabel"
+                            FontSize="11.5"
+                            FontWeight="SemiBold" />
+                    </StackPanel>
+                </Button>
+
+                <!-- Theme Switch (System / Light / Dark) -->
+                <Button
+                    x:Name="ThemeToggleButton"
+                    Padding="7,0"
+                    Click="ThemeToggleButton_Click"
+                    Style="{StaticResource StudioTitleBarButtonStyle}">
+                    <FontIcon x:Name="ThemeToggleIcon" FontSize="13" Glyph="&#xE793;" />
+                </Button>
+
+                <!-- Toggle Right Log Panel -->
+                <Button
+                    x:Name="ToggleLogPanelButton"
+                    Padding="7,0"
+                    Click="ToggleLogPanelButton_Click"
+                    Style="{StaticResource StudioTitleBarButtonStyle}">
                     <FontIcon
-                        Grid.Column="0"
-                        VerticalAlignment="Center"
-                        FontSize="12"
-                        Foreground="{ThemeResource StudioSystemAccentBrush}"
-                        Glyph="&#xE756;" />
-
-                    <TextBlock
-                        Grid.Column="1"
-                        VerticalAlignment="Center"
-                        FontSize="12"
-                        FontWeight="Bold"
-                        Foreground="{ThemeResource StudioTextPrimaryBrush}"
-                        Text="{loc:L Zh='运行日志', En='Run Logs'}" />
-
-                    <!-- Live Streaming / Line Count Pill -->
-                    <Border
-                        Grid.Column="2"
-                        Height="20"
-                        Padding="7,0"
-                        VerticalAlignment="Center"
-                        Background="{ThemeResource StudioPrimaryOpacity06Brush}"
-                        CornerRadius="10">
-                        <StackPanel Orientation="Horizontal" Spacing="4">
-                            <Ellipse
-                                x:Name="LogLiveDot"
-                                Width="5.5"
-                                Height="5.5"
-                                VerticalAlignment="Center"
-                                Fill="{ThemeResource StudioSecondaryOpacity45Brush}" />
-                            <TextBlock
-                                x:Name="LogLiveBadgeText"
-                                FontFamily="{StaticResource StudioMonoFont}"
-                                FontSize="10"
-                                FontWeight="Medium"
-                                Foreground="{ThemeResource StudioTextSecondaryBrush}" />
-                        </StackPanel>
-                    </Border>
-
-                    <!-- Copy All Logs -->
-                    <Button
-                        Grid.Column="4"
-                        Click="CopyLogsButton_Click"
-                        Style="{StaticResource HeaderIconButtonStyle}"
-                        ToolTipService.ToolTip="{loc:L Zh='复制全部日志', En='Copy all logs'}">
-                        <FontIcon
-                            FontSize="11.5"
-                            Foreground="{ThemeResource StudioTextSecondaryBrush}"
-                            Glyph="&#xE8C8;" />
-                    </Button>
-
-                    <!-- Clear Logs -->
-                    <Button
-                        Grid.Column="5"
-                        Click="ClearLogsButton_Click"
-                        Style="{StaticResource HeaderIconButtonStyle}"
-                        ToolTipService.ToolTip="{loc:L Zh='清空当前日志', En='Clear console logs'}">
-                        <FontIcon
-                            FontSize="11.5"
-                            Foreground="{ThemeResource StudioTextSecondaryBrush}"
-                            Glyph="&#xE74D;" />
-                    </Button>
-                </Grid>
-
-                <Border Grid.Row="1" Background="{ThemeResource StudioSplitDividerBrush}" />
-
-                <views:RightLogPanel x:Name="LogPanelView" Grid.Row="2" />
-            </Grid>
+                        x:Name="ToggleLogPanelIcon"
+                        FontSize="13"
+                        Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                        Glyph="&#xE90C;" />
+                </Button>
+            </StackPanel>
         </Grid>
 
-        <!-- Modal Overlays (topmost Z-order, each manages its own Visibility via StudioViewModel.Shared) -->
-        <dialogs:ColabGuideDialog />
-        <dialogs:AddCustomHFModelDialog />
-        <dialogs:HFModelDetailOverlay />
+        <!-- Main 3-Column Fluent 2 Layered Body -->
+        <Grid
+            x:Name="ShellGrid"
+            Grid.Row="1"
+            Background="Transparent">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="346" />
+                <ColumnDefinition Width="*" MinWidth="500" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <!-- 1. Left Control Sidebar (transparent to reveal Mica Alt behind cards) -->
+            <views:SidebarPanel
+                x:Name="LeftSidebarPanel"
+                Grid.Column="0"
+                Background="Transparent" />
+
+            <!-- 2. Center Main Workspace (elevated Fluent 2 rounded layer) -->
+            <Border
+                Grid.Column="1"
+                Margin="0,0,8,8"
+                Background="{ThemeResource StudioWorkspaceCanvasBrush}"
+                BorderBrush="{ThemeResource StudioCardBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="8">
+                <ws:WorkspacePanel x:Name="CenterWorkspacePanel" />
+            </Border>
+
+            <!-- 3. Right Collapsible Run Log Surface (elevated Fluent 2 rounded layer) -->
+            <Border
+                x:Name="RightLogColumnHost"
+                Grid.Column="2"
+                Width="344"
+                Margin="0,0,8,8"
+                Background="{ThemeResource StudioLogPanelBackgroundBrush}"
+                BorderBrush="{ThemeResource StudioCardBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="8">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="1" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Clean Embedded Log Header -->
+                    <Grid
+                        Grid.Row="0"
+                        Padding="12,0,8,0"
+                        ColumnSpacing="6">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <FontIcon
+                            Grid.Column="0"
+                            VerticalAlignment="Center"
+                            FontSize="12.5"
+                            Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                            Glyph="&#xE756;" />
+
+                        <TextBlock
+                            Grid.Column="1"
+                            VerticalAlignment="Center"
+                            FontSize="12.5"
+                            FontWeight="SemiBold"
+                            Foreground="{ThemeResource StudioTextPrimaryBrush}"
+                            Text="{loc:L Zh='运行日志', En='Run Logs'}" />
+
+                        <!-- Live Streaming / Line Count Badge -->
+                        <Border
+                            Grid.Column="2"
+                            Height="20"
+                            Padding="7,0"
+                            VerticalAlignment="Center"
+                            Background="{ThemeResource SubtleFillColorSecondaryBrush}"
+                            CornerRadius="4">
+                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                <Ellipse
+                                    x:Name="LogLiveDot"
+                                    Width="5.5"
+                                    Height="5.5"
+                                    VerticalAlignment="Center"
+                                    Fill="{ThemeResource StudioSecondaryOpacity45Brush}" />
+                                <TextBlock
+                                    x:Name="LogLiveBadgeText"
+                                    VerticalAlignment="Center"
+                                    FontFamily="{StaticResource StudioMonoFont}"
+                                    FontSize="10.5"
+                                    Foreground="{ThemeResource StudioTextSecondaryBrush}" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Copy All Logs -->
+                        <Button
+                            Grid.Column="4"
+                            Height="26"
+                            MinWidth="26"
+                            Padding="5,0"
+                            Click="CopyLogsButton_Click"
+                            Style="{StaticResource StudioTitleBarButtonStyle}"
+                            ToolTipService.ToolTip="{loc:L Zh='复制全部日志', En='Copy all logs'}">
+                            <FontIcon
+                                FontSize="12"
+                                Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                Glyph="&#xE8C8;" />
+                        </Button>
+
+                        <!-- Clear Logs -->
+                        <Button
+                            Grid.Column="5"
+                            Height="26"
+                            MinWidth="26"
+                            Padding="5,0"
+                            Click="ClearLogsButton_Click"
+                            Style="{StaticResource StudioTitleBarButtonStyle}"
+                            ToolTipService.ToolTip="{loc:L Zh='清空当前日志', En='Clear console logs'}">
+                            <FontIcon
+                                FontSize="12"
+                                Foreground="{ThemeResource StudioTextSecondaryBrush}"
+                                Glyph="&#xE74D;" />
+                        </Button>
+                    </Grid>
+
+                    <Border Grid.Row="1" Background="{ThemeResource StudioSplitDividerBrush}" />
+
+                    <views:RightLogPanel x:Name="LogPanelView" Grid.Row="2" />
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Topmost Modal Overlays (spanning full window including titlebar) -->
+        <dialogs:ColabGuideDialog Grid.RowSpan="2" />
+        <dialogs:AddCustomHFModelDialog Grid.RowSpan="2" />
+        <dialogs:HFModelDetailOverlay Grid.RowSpan="2" />
     </Grid>
 </UserControl>

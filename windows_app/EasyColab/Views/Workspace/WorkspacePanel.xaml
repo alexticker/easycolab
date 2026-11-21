@@ -8,16 +8,14 @@
     xmlns:local="using:EasyColab.Views.Workspace">
 
     <UserControl.Resources>
+        <!-- Preserve native WinUI 3 Fluent 2 TextBox appearance -->
         <Style x:Key="WorkspacePromptBoxStyle" TargetType="TextBox">
             <Setter Property="AcceptsReturn" Value="True" />
             <Setter Property="TextWrapping" Value="Wrap" />
             <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
-            <Setter Property="Background" Value="{ThemeResource StudioInputFillBrush}" />
-            <Setter Property="BorderBrush" Value="{ThemeResource StudioCardBorderBrush}" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="CornerRadius" Value="7" />
+            <Setter Property="CornerRadius" Value="6" />
             <Setter Property="FontSize" Value="12" />
-            <Setter Property="Padding" Value="9,7" />
+            <Setter Property="Padding" Value="10,8" />
         </Style>
     </UserControl.Resources>
 
@@ -31,13 +29,13 @@
             HorizontalAlignment="Stretch">
             <StackPanel Spacing="16">
 
-                <!-- 1. Top Model Overview & Mode Switcher Header (Swift: modeSwitcherHeader) -->
+                <!-- 1. Top Model Overview & Mode Switcher Header (Fluent 2 card) -->
                 <Border
                     Padding="16"
                     Background="{ThemeResource StudioWorkspaceCardFillBrush}"
                     BorderBrush="{ThemeResource StudioCardBorderBrush}"
-                    BorderThickness="0.8"
-                    CornerRadius="12">
+                    BorderThickness="1"
+                    CornerRadius="8">
                     <StackPanel Spacing="12">
                         <Grid ColumnSpacing="10">
                             <Grid.ColumnDefinitions>
@@ -347,7 +345,7 @@
                                 Padding="16,0"
                                 HorizontalAlignment="Stretch"
                                 Click="GenerateButton_Click"
-                                CornerRadius="8"
+                                CornerRadius="6"
                                 Style="{StaticResource StudioPrimaryButtonStyle}">
                                 <Button.KeyboardAccelerators>
                                     <KeyboardAccelerator Key="Enter" Modifiers="Control" />
@@ -361,19 +359,16 @@
                                         x:Name="GenerateSpinner"
                                         Width="14"
                                         Height="14"
-                                        Foreground="White"
                                         IsActive="False"
                                         Visibility="Collapsed" />
                                     <FontIcon
                                         x:Name="GenerateButtonIcon"
                                         FontSize="12.5"
-                                        Foreground="White"
                                         Glyph="&#xE768;" />
                                     <TextBlock
                                         x:Name="GenerateButtonText"
                                         FontSize="13"
                                         FontWeight="SemiBold"
-                                        Foreground="White"
                                         MaxLines="1"
                                         TextTrimming="CharacterEllipsis" />
                                 </StackPanel>

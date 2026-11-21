@@ -10,8 +10,8 @@ using Windows.ApplicationModel.DataTransfer;
 namespace EasyColab.Views;
 
 /// <summary>
-/// Port of Swift <c>MainStudioView</c> (3-column shell, unified top headers,
-/// disconnect confirmation dialog, and topmost modal overlay host).
+/// Native Windows 11 Fluent 2 main shell: unified 48px Mica title bar, transparent left control sidebar,
+/// elevated rounded center workspace, collapsible right log surface, and topmost modal overlay host.
 /// </summary>
 public sealed partial class MainStudioPage : UserControl
 {
@@ -62,6 +62,10 @@ public sealed partial class MainStudioPage : UserControl
         _isAttached = true;
         ViewModel.PropertyChanged += OnViewModelPropertyChanged;
         ViewModel.LiveConsoleLines.CollectionChanged += OnConsoleLinesChanged;
+        if (App.MainAppWindow is not null)
+        {
+            App.MainAppWindow.ThemePreferenceChanged += OnThemePreferenceChanged;
+        }
     }
 
     public void Detach()
@@ -70,8 +74,17 @@ public sealed partial class MainStudioPage : UserControl
         _isAttached = false;
         ViewModel.PropertyChanged -= OnViewModelPropertyChanged;
         ViewModel.LiveConsoleLines.CollectionChanged -= OnConsoleLinesChanged;
+        if (App.MainAppWindow is not null)
+        {
+            App.MainAppWindow.ThemePreferenceChanged -= OnThemePreferenceChanged;
+        }
         LeftSidebarPanel.Detach();
         LogPanelView.Detach();
+    }
+
+    private void OnThemePreferenceChanged(object? sender, EventArgs e)
+    {
+        SyncThemeButtonVisual();
     }
 
     public void RegisterTitleBarDragArea()
@@ -144,11 +157,30 @@ public sealed partial class MainStudioPage : UserControl
         LanguageToggleLabel.Text = isEn ? "中文" : "EN";
         ToolTipService.SetToolTip(
             LanguageToggleButton,
-            isEn ? "切换界面为简体中文" : "Switch UI to English");
+            isEn ? "切换界面为简体中文 (Ctrl+Shift+L)" : "Switch UI to English (Ctrl+Shift+L)");
 
         SyncWorkspaceHeaderStatus();
         SyncLogHeaderBadge();
+        SyncThemeButtonVisual();
         SyncToggleLogButtonVisual();
+    }
+
+    private void SyncThemeButtonVisual()
+    {
+        var pref = App.MainAppWindow?.ThemePreference ?? ElementTheme.Default;
+        ThemeToggleIcon.Glyph = pref switch
+        {
+            ElementTheme.Light => "\uE706", // Sun
+            ElementTheme.Dark => "\uE708",  // Moon
+            _ => "\uE793",                  // Auto / System theme
+        };
+        string tip = pref switch
+        {
+            ElementTheme.Light => L("当前：浅色模式（点击切换深色）", "Theme: Light (click for Dark)"),
+            ElementTheme.Dark => L("当前：深色模式（点击跟随系统）", "Theme: Dark (click to follow Windows)"),
+            _ => L("当前：跟随系统主题（点击切换浅色）", "Theme: System (click for Light)"),
+        };
+        ToolTipService.SetToolTip(ThemeToggleButton, tip);
     }
 
     private void SyncWorkspaceHeaderStatus()
@@ -201,11 +233,8 @@ public sealed partial class MainStudioPage : UserControl
 
     private void ApplyLogPanelVisibility()
     {
-        var vis = _showRightLogPanel ? Visibility.Visible : Visibility.Collapsed;
-        RightColumnDivider.Visibility = vis;
-        RightLogColumnHost.Visibility = vis;
+        RightLogColumnHost.Visibility = _showRightLogPanel ? Visibility.Visible : Visibility.Collapsed;
         SyncToggleLogButtonVisual();
-        UpdateCaptionInsets();
     }
 
     private void UpdateCaptionInsets()
@@ -219,17 +248,7 @@ public sealed partial class MainStudioPage : UserControl
                 inset = Math.Clamp(raw / xr.RasterizationScale, 128.0, 180.0);
             }
         }
-
-        if (_showRightLogPanel)
-        {
-            LogHeaderCaptionSpacer.Width = new GridLength(inset);
-            WorkspaceHeaderCaptionSpacer.Width = new GridLength(0);
-        }
-        else
-        {
-            LogHeaderCaptionSpacer.Width = new GridLength(0);
-            WorkspaceHeaderCaptionSpacer.Width = new GridLength(inset);
-        }
+        TitleBarCaptionSpacer.Width = new GridLength(inset);
     }
 
     private async Task ShowDisconnectConfirmDialogAsync()
@@ -274,6 +293,11 @@ public sealed partial class MainStudioPage : UserControl
     private void LanguageToggleButton_Click(object sender, RoutedEventArgs e)
     {
         ViewModel.ToggleLanguage();
+    }
+
+    private void ThemeToggleButton_Click(object sender, RoutedEventArgs e)
+    {
+        App.MainAppWindow?.CycleThemePreference();
     }
 
     private void OpenGuideButton_Click(object sender, RoutedEventArgs e)
