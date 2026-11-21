@@ -6,6 +6,7 @@
     xmlns:loc="using:EasyColab.Localization"
     HorizontalAlignment="Stretch"
     VerticalAlignment="Stretch"
+    KeyboardAcceleratorPlacementMode="Hidden"
     Visibility="Collapsed">
 
     <UserControl.KeyboardAccelerators>
