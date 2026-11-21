@@ -3755,17 +3755,42 @@ MINIMAX_H3_IMAGE_REQUIRED_CONFIG_MARKERS = (
 
 def ensure_minimax_h3_image_dependencies() -> Tuple[Any, Any]:
     """
-    确保当前环境已安装支持 MiniMaxH3ImageModularPipeline 的最新版 diffusers (>=0.43.0)。
-    若 Colab 预装版本较旧，自动静默升级并热刷新 sys.modules。
+    确保当前环境已安装支持 MiniMaxH3ImageModularPipeline 的最新版 diffusers (>=0.43.0) 与兼容版 transformers。
+    若 Colab 预装版本较旧，自动静默升级并同时热刷新 diffusers 与 transformers 的 sys.modules 缓存。
     """
-    try:
+    import importlib
+
+    def _import_minimax_modular() -> Tuple[Any, Any]:
         from diffusers import ComponentsManager, ModularPipeline
         from diffusers.modular_pipelines.minimax_h3_image import MiniMaxH3ImageModularPipeline  # noqa: F401
+        import diffusers.modular_pipelines.minimax_h3_image.modular_blocks_minimax_h3_image  # noqa: F401
 
         return ComponentsManager, ModularPipeline
-    except Exception:
-        print("[MiniMax-H3-Image] 检测到当前 diffusers 版本不含 MiniMaxH3ImageModularPipeline，正在升级 diffusers>=0.43.0 ...")
-        MODEL_DOWNLOAD_STATE["message"] = "正在自动升级 diffusers>=0.43.0 以支持 MiniMax-H3-Image 模块化管线..."
+
+    def _reload_hf_modules() -> None:
+        prefixes = ("diffusers", "transformers")
+        for mod_key in [
+            k
+            for k in list(sys.modules.keys())
+            if any(k == p or k.startswith(f"{p}.") for p in prefixes)
+        ]:
+            sys.modules.pop(mod_key, None)
+        importlib.invalidate_caches()
+        try:
+            _ensure_torchaudio_compatible()
+        except Exception:
+            pass
+
+    try:
+        return _import_minimax_modular()
+    except Exception as first_err:
+        print(
+            f"[MiniMax-H3-Image] 检测到依赖版本不兼容 ({first_err})，"
+            "正在升级 diffusers>=0.43.0 与最新 transformers ..."
+        )
+        MODEL_DOWNLOAD_STATE["message"] = (
+            "正在自动升级 diffusers>=0.43.0 与最新 transformers 以支持 MiniMax-H3-Image 模块化管线..."
+        )
         subprocess.check_call(
             [
                 sys.executable,
@@ -3775,20 +3800,41 @@ def ensure_minimax_h3_image_dependencies() -> Tuple[Any, Any]:
                 "-q",
                 "-U",
                 "diffusers>=0.43.0",
-                "transformers>=4.57.0",
+                "transformers",
                 "accelerate",
             ]
         )
-        import importlib
-
-        for mod_key in [k for k in list(sys.modules.keys()) if k == "diffusers" or k.startswith("diffusers.")]:
-            sys.modules.pop(mod_key, None)
-        importlib.invalidate_caches()
-        from diffusers import ComponentsManager, ModularPipeline
-        from diffusers.modular_pipelines.minimax_h3_image import MiniMaxH3ImageModularPipeline  # noqa: F401
-
-        print("[MiniMax-H3-Image] diffusers>=0.43.0 热升级校验通过！")
-        return ComponentsManager, ModularPipeline
+        _reload_hf_modules()
+        try:
+            ComponentsManager, ModularPipeline = _import_minimax_modular()
+            print("[MiniMax-H3-Image] diffusers>=0.43.0 与 transformers 热升级校验通过！")
+            return ComponentsManager, ModularPipeline
+        except Exception as second_err:
+            err_text = str(second_err)
+            if "transformers" in err_text or "MultimodalBaseModelOutputWithPast" in err_text:
+                print(
+                    f"[MiniMax-H3-Image] PyPI 最新版 transformers 仍不满足符号要求 ({second_err})，"
+                    "尝试从 HuggingFace GitHub main 分支安装最新 transformers ..."
+                )
+                MODEL_DOWNLOAD_STATE["message"] = (
+                    "正在从 GitHub 安装最新开发版 transformers 以匹配 MiniMax-H3-Image 模块化管线..."
+                )
+                subprocess.check_call(
+                    [
+                        sys.executable,
+                        "-m",
+                        "pip",
+                        "install",
+                        "-q",
+                        "-U",
+                        "git+https://github.com/huggingface/transformers.git",
+                    ]
+                )
+                _reload_hf_modules()
+                ComponentsManager, ModularPipeline = _import_minimax_modular()
+                print("[MiniMax-H3-Image] transformers (main) 热升级校验通过！")
+                return ComponentsManager, ModularPipeline
+            raise
 
 
 def prepare_minimax_h3_image_assembled_dir(

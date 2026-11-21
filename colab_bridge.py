@@ -978,11 +978,11 @@ if not _native_drive_ok and os.path.exists(rc_existing):
                 except Exception:
                     pass
 
-# 1. 如果尚未安装 DiffSynth-Studio，自动快速安装 (含最新 transformers 以支持 Qwen3.8-27B)
+# 1. 如果尚未安装 DiffSynth-Studio，自动快速安装 (含最新 diffusers 与 transformers 以支持 MiniMax-H3-Image 与 Qwen3.8-27B)
 if not os.path.exists("/content/DiffSynth-Studio"):
     print("正在克隆 DiffSynth-Studio...", flush=True)
     subprocess.run(["git", "clone", "--depth", "1", "https://github.com/modelscope/DiffSynth-Studio.git", "/content/DiffSynth-Studio"], check=True)
-    subprocess.run([sys.executable, "-m", "pip", "install", "-q", "-U", "transformers", "accelerate", "bitsandbytes", "huggingface_hub", "hf_transfer", "qwen-vl-utils", "einops", "kernels>=0.17.2,<0.18.0", "av", "gradio", "modelscope", "imageio", "imageio-ffmpeg", "scipy", "soundfile", "librosa"], check=True)
+    subprocess.run([sys.executable, "-m", "pip", "install", "-q", "-U", "diffusers>=0.43.0", "transformers", "accelerate", "bitsandbytes", "huggingface_hub", "hf_transfer", "qwen-vl-utils", "einops", "kernels>=0.17.2,<0.18.0", "av", "gradio", "modelscope", "imageio", "imageio-ffmpeg", "scipy", "soundfile", "librosa"], check=True)
     subprocess.run([sys.executable, "-m", "pip", "install", "-q", "--no-deps", "fla-core", "flash-linear-attention"], check=False)
     subprocess.run([sys.executable, "-m", "pip", "install", "-q", "--no-deps", "--only-binary=:all:", "causal-conv1d"], check=False)
     subprocess.run([sys.executable, "-m", "pip", "install", "-q", "-e", "/content/DiffSynth-Studio"], check=True)
@@ -993,6 +993,10 @@ else:
     except Exception:
         subprocess.run([sys.executable, "-m", "pip", "install", "-q", "einops", "kernels>=0.17.2,<0.18.0"], check=False)
         subprocess.run([sys.executable, "-m", "pip", "install", "-q", "--no-deps", "--force-reinstall", "fla-core", "flash-linear-attention"], check=False)
+    try:
+        import diffusers.modular_pipelines.minimax_h3_image.modular_blocks_minimax_h3_image  # noqa: F401
+    except Exception:
+        subprocess.run([sys.executable, "-m", "pip", "install", "-q", "-U", "diffusers>=0.43.0", "transformers", "accelerate"], check=False)
 
 # 2. 检查是否已有运行中的 app.py 或 llama-server，先清理旧进程释放 GPU 显存
 subprocess.run(["pkill", "-f", "python.*/content/app.py"], check=False)
