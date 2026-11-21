@@ -1544,6 +1544,8 @@ public sealed partial class StudioViewModel : ObservableObject
 
     public void ApplyLiveTelemetrySnapshot(LiveTelemetrySnapshot snap)
     {
+        if (IgnoreColabRuntimeStatus) return;
+
         if (!string.IsNullOrEmpty(snap.GpuName)) GpuName = snap.GpuName;
         if (snap.VramFreeGb is { } vf) VramFreeGB = vf;
         if (snap.VramTotalGb is { } vt) VramTotalGB = vt;
@@ -1654,6 +1656,8 @@ public sealed partial class StudioViewModel : ObservableObject
         ComfyPublicURL = string.Empty;
         ComfyQueueRunning = 0;
         ComfyQueuePending = 0;
+        ComfyProgress = 0.0;
+        ComfyStatusMessage = string.Empty;
         ProgressValue = 0.0;
         ModelTaskProgress = 0.0;
         VramUsedGB = 0.0;
@@ -1675,7 +1679,9 @@ public sealed partial class StudioViewModel : ObservableObject
         RamHistoryPct = [];
         DiskHistoryPct = [];
         LastTelemetrySampleDate = DateTime.MinValue;
+        UptimeSeconds = 0;
         CuBurnRatePerHour = 0.0;
+        ConsecutiveStatusFailures = 0;
         LoadedContextLengthTokens = 0;
         RemoteContextSynced = false;
         RemoteIdleSynced = false;

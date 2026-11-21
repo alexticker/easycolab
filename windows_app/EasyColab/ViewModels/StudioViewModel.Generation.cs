@@ -7,6 +7,15 @@ namespace EasyColab.ViewModels;
 
 public sealed partial class StudioViewModel
 {
+    private bool _isReleasingColab;
+    private int _colabReleaseGeneration;
+    private string? _releasedColabUrl;
+
+    private bool IgnoreColabRuntimeStatus => _isReleasingColab || _releasedColabUrl == NormalizedBaseURL;
+
+    private bool IsCurrentColabReleaseGeneration(int generation) =>
+        !_isReleasingColab && generation == _colabReleaseGeneration;
+
     public void SwitchSelectedModel(OpenModelSpec spec)
     {
         if (SelectedModelId == spec.Id) return;
@@ -119,6 +128,9 @@ public sealed partial class StudioViewModel
 
     public async Task CheckColabStatusAsync(bool silent = false)
     {
+        if (_isReleasingColab || (silent && IgnoreColabRuntimeStatus)) return;
+
+        int releaseGeneration = _colabReleaseGeneration;
         var baseUrl = NormalizedBaseURL;
         var now = DateTime.UtcNow;
         bool shouldTouchActivity = !silent || (
@@ -157,6 +169,8 @@ public sealed partial class StudioViewModel
             using var req = AdminRequest(uri);
             var timeout = TimeSpan.FromSeconds(IsGenerating ? 28 : (silent ? 20 : 22));
             using var resp = await SendAdminAsync(req, timeout);
+            if (!IsCurrentColabReleaseGeneration(releaseGeneration) || baseUrl != NormalizedBaseURL) return;
+
             int statusCode = (int)resp.StatusCode;
 
             if (statusCode == 404)
@@ -188,10 +202,13 @@ public sealed partial class StudioViewModel
                 return;
             }
 
-            ConsecutiveStatusFailures = 0;
             var json = await resp.Content.ReadAsStringAsync();
+            if (!IsCurrentColabReleaseGeneration(releaseGeneration) || baseUrl != NormalizedBaseURL) return;
+
             var decoded = ModelJson.Decode<ColabStatusResponse>(json)
                 ?? throw new InvalidDataException("Empty ColabStatusResponse JSON.");
+            if (!silent && _releasedColabUrl == baseUrl) _releasedColabUrl = null;
+            ConsecutiveStatusFailures = 0;
             ApplyStatusResponse(decoded);
 
             if (!silent)
@@ -219,6 +236,8 @@ public sealed partial class StudioViewModel
         }
         catch (Exception ex)
         {
+            if (!IsCurrentColabReleaseGeneration(releaseGeneration) || baseUrl != NormalizedBaseURL) return;
+
             ConsecutiveStatusFailures += 1;
             int failureLimit = IsGenerating ? 8 : 5;
             if (!silent)
@@ -1040,78 +1059,69 @@ public sealed partial class StudioViewModel
 
     public async Task DisconnectRemoteColabAsync()
     {
-        StopActiveWakeProcess();
-        StopKeepaliveDaemon();
-        StatusMessage = L(
-            "正在释放云端 Colab 实例并同步账户计费状态...",
-            "Terminating cloud Colab instances & syncing billing status...");
+        if (_isReleasingColab) return;
+        _isReleasingColab = true;
+        _colabReleaseGeneration++;
 
-        var baseUrl = NormalizedBaseURL;
-        if (!string.IsNullOrEmpty(baseUrl) && Uri.TryCreate($"{baseUrl}/minimax_api/disconnect", UriKind.Absolute, out var disconnectUri))
+        try
         {
-            try
-            {
-                using var req = AdminRequest(disconnectUri, HttpMethod.Post);
-                using var _ = await SendAdminAsync(req, TimeSpan.FromSeconds(8));
-            }
-            catch
-            {
-                // Best-effort remote disconnect.
-            }
-        }
-
-        if (CliLoggedIn)
-        {
-            var outJson = await RunBridgeCommandAsync(["stop_all"]);
-            var decoded = ModelJson.TryDecode<BridgeAuthStatusResponse>(outJson);
-            if (decoded is not null)
-            {
-                OfficialCUBalance = decoded.PaidBalance ?? OfficialCUBalance;
-                OfficialBurnRate = decoded.BurnRateHourly ?? 0.0;
-                ActiveVMCount = decoded.ActiveAssignments ?? 0;
-                StatusMessage = decoded.Message ?? L(
-                    "已彻底释放全部云端实例，计费速率归零。",
-                    "All cloud Colab instances terminated. Billing rate is now 0 CU/h.");
-            }
-        }
-        else
-        {
+            StopActiveWakeProcess();
+            StopKeepaliveDaemon();
             StatusMessage = L(
-                "已发送释放指令，Colab 实例已停止计费。",
-                "Release command sent. Colab runtime billing stopped.");
-        }
+                "正在释放云端 Colab 实例并同步账户计费状态...",
+                "Terminating cloud Colab instances & syncing billing status...");
 
-        StopKeepaliveDaemon();
-        StopLiveGenerationTimer();
-        IsConnected = false;
-        ModelLoaded = false;
-        LoadedModelId = null;
-        LoadedModelIds = [];
-        LoadedModelsDetail = [];
-        LoadedContextLengthTokens = 0;
-        RamTotalGB = 0.0;
-        RamUsedGB = 0.0;
-        RamFreeGB = 0.0;
-        DiskTotalGB = 0.0;
-        DiskUsedGB = 0.0;
-        DiskFreeGB = 0.0;
-        ShmTotalGB = 0.0;
-        ShmUsedGB = 0.0;
-        ShmFreeGB = 0.0;
-        DriveTotalGB = 0.0;
-        DriveUsedGB = 0.0;
-        DriveFreeGB = 0.0;
-        VramHistoryPct = [];
-        RamHistoryPct = [];
-        DiskHistoryPct = [];
-        LastTelemetrySampleDate = DateTime.MinValue;
-        RemoteContextSynced = false;
-        RemoteIdleSynced = false;
-        RemoteApiKeySynced = false;
-        LastIdleSyncAttemptAt = DateTime.MinValue;
-        LastContextSyncAttemptAt = DateTime.MinValue;
-        UptimeSeconds = 0;
-        CuBurnRatePerHour = 0.0;
-        SyncRuntimeActivityAssertion();
+            var baseUrl = NormalizedBaseURL;
+            if (!string.IsNullOrEmpty(baseUrl) && Uri.TryCreate($"{baseUrl}/minimax_api/disconnect", UriKind.Absolute, out var disconnectUri))
+            {
+                try
+                {
+                    using var req = AdminRequest(disconnectUri, HttpMethod.Post);
+                    using var _ = await SendAdminAsync(req, TimeSpan.FromSeconds(8));
+                }
+                catch
+                {
+                    // The tunnel may close before the remote release request returns.
+                }
+            }
+
+            BridgeAuthStatusResponse? release = null;
+            if (CliLoggedIn)
+            {
+                var output = await RunBridgeCommandAsync(["stop_all"]);
+                release = ModelJson.TryDecode<BridgeAuthStatusResponse>(output);
+            }
+
+            if (release is not { Ok: true, ActiveAssignments: int count })
+            {
+                StatusMessage = L(
+                    "尚无法确认 Colab 实例是否已全部释放，请刷新 Google 账号状态后查看。",
+                    "Could not confirm that all Colab instances were released. Refresh the Google account status to check.");
+                return;
+            }
+
+            OfficialCUBalance = release.PaidBalance ?? OfficialCUBalance;
+            OfficialBurnRate = release.BurnRateHourly ?? OfficialBurnRate;
+            ActiveVMCount = count;
+            if (count != 0)
+            {
+                StatusMessage = L(
+                    $"Colab 仍有 {count} 台活跃实例，请稍后刷新状态或重试释放。",
+                    $"Colab still reports {count} active instance(s). Refresh the status or retry releasing them.");
+                return;
+            }
+
+            _releasedColabUrl = baseUrl;
+            ResetStaleRemoteRuntimeState(string.Empty);
+            StatusMessage = release.BurnRateHourly == 0.0
+                ? L("已释放全部 Colab 实例，当前计费速率为 0 CU/小时。",
+                    "All Colab instances released. Current billing rate is 0 CU/h.")
+                : L("Colab 已确认没有活跃实例，计费速率等待同步。",
+                    "Colab confirmed no active instances. Waiting for the billing rate to update.");
+        }
+        finally
+        {
+            _isReleasingColab = false;
+        }
     }
 }

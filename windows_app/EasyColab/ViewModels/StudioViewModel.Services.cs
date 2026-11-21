@@ -325,7 +325,12 @@ public sealed partial class StudioViewModel
 
     public async Task RefreshOfficialColabAccountUsageAsync()
     {
+        if (_isReleasingColab) return;
+
+        int releaseGeneration = _colabReleaseGeneration;
         string output = await RunBridgeCommandAsync(["auth_status"], installIfMissing: false);
+        if (!IsCurrentColabReleaseGeneration(releaseGeneration)) return;
+
         var decoded = ModelJson.TryDecode<BridgeAuthStatusResponse>(output);
         if (decoded is null) return;
 
@@ -729,16 +734,17 @@ public sealed partial class StudioViewModel
 
     public async Task EnsureKeepaliveDaemonRunningAsync()
     {
-        if (!CliLoggedIn || !IsConnected || IsWakingColab) return;
+        if (!CliLoggedIn || !IsConnected || IsWakingColab || IgnoreColabRuntimeStatus) return;
         if (IsKeepaliveProcessRunning()) return;
         if (_isStartingKeepaliveDaemon) return;
 
         _isStartingKeepaliveDaemon = true;
+        int releaseGeneration = _colabReleaseGeneration;
         try
         {
             string? pyBin = await EnsureBridgePythonBinAsync(installIfMissing: false);
             if (string.IsNullOrEmpty(pyBin)) return;
-            if (!CliLoggedIn || !IsConnected || IsWakingColab) return;
+            if (!CliLoggedIn || !IsConnected || IsWakingColab || !IsCurrentColabReleaseGeneration(releaseGeneration)) return;
             if (IsKeepaliveProcessRunning()) return;
 
             StopKeepaliveDaemon();
@@ -790,6 +796,7 @@ public sealed partial class StudioViewModel
                         {
                             UiDispatcher.Run(() =>
                             {
+                                if (ct.IsCancellationRequested) return;
                                 foreach (string payload in payloads)
                                 {
                                     HandleKeepaliveDaemonPayloadLine(payload);
@@ -830,16 +837,19 @@ public sealed partial class StudioViewModel
 
     public async Task KeepaliveColabRuntimeAsync()
     {
-        if (!CliLoggedIn || IsWakingColab) return;
+        if (!CliLoggedIn || IsWakingColab || IgnoreColabRuntimeStatus) return;
+        int releaseGeneration = _colabReleaseGeneration;
         if (IsConnected)
         {
             await EnsureKeepaliveDaemonRunningAsync();
-            if (IsKeepaliveProcessRunning())
+            if (!IsCurrentColabReleaseGeneration(releaseGeneration) || IsKeepaliveProcessRunning())
             {
                 return;
             }
         }
         string output = await RunBridgeCommandAsync(["keepalive"]);
+        if (!IsCurrentColabReleaseGeneration(releaseGeneration)) return;
+
         var decoded = ModelJson.TryDecode<BridgeAuthStatusResponse>(output);
         if (decoded is null) return;
 
@@ -1010,6 +1020,8 @@ public sealed partial class StudioViewModel
 
     public void ApplyStatusResponse(ColabStatusResponse decoded)
     {
+        if (IgnoreColabRuntimeStatus) return;
+
         IsConnected = true;
         GpuName = decoded.GpuName ?? "Colab GPU";
         VramFreeGB = decoded.VramFreeGb ?? 0.0;
