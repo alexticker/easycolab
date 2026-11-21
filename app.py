@@ -6674,7 +6674,7 @@ def _try_adopt_running_comfyui():
         try:
             cf_bin = _ensure_cloudflared_binary()
             tunnel_proc = subprocess.Popen(
-                [cf_bin, "tunnel", "--url", f"http://127.0.0.1:{COMFY_INGRESS}", "--no-autoupdate"],
+                [cf_bin, "tunnel", "--url", f"http://127.0.0.1:{COMFY_INGRESS}", "--protocol", "http2", "--no-autoupdate"],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 text=True,
@@ -7248,7 +7248,7 @@ def start_comfyui_core(unload_existing: bool = False, force_restart: bool = Fals
         COMFYUI_STATE["status_message"] = "ComfyUI 内核已就绪，正在建立 Cloudflare 高速全屏画布隧道..."
         cf_bin = _ensure_cloudflared_binary()
         tunnel_proc = subprocess.Popen(
-            [cf_bin, "tunnel", "--url", f"http://127.0.0.1:{COMFY_INGRESS}", "--no-autoupdate"],
+            [cf_bin, "tunnel", "--url", f"http://127.0.0.1:{COMFY_INGRESS}", "--protocol", "http2", "--no-autoupdate"],
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
