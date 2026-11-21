@@ -51,7 +51,7 @@
             Margin="28"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch"
-            Background="{ThemeResource StudioWorkspaceCardFillBrush}"
+            Background="{ThemeResource StudioDialogSurfaceBrush}"
             BorderBrush="{ThemeResource StudioCardBorderBrush}"
             BorderThickness="1"
             CornerRadius="12">

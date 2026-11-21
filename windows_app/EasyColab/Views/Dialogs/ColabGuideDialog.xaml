@@ -25,7 +25,7 @@
         </Style>
 
         <Style x:Key="GuideInfoCardBorderStyle" TargetType="Border">
-            <Setter Property="Background" Value="{ThemeResource StudioWorkspaceCardFillBrush}" />
+            <Setter Property="Background" Value="{ThemeResource StudioDialogCardFillBrush}" />
             <Setter Property="BorderBrush" Value="{ThemeResource StudioCardBorderBrush}" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="CornerRadius" Value="10" />
@@ -63,30 +63,32 @@
             Background="#88000000"
             PointerPressed="OnScrimPointerPressed" />
 
-        <!-- Centered Elevated Dialog Card (~860x640, shrinks cleanly on smaller windows) -->
+        <!-- Centered Elevated Dialog Card (~920x640, shrinks cleanly on smaller windows) -->
         <Border
-            MaxWidth="860"
+            MaxWidth="920"
             MaxHeight="640"
             Margin="28"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch"
-            Background="{ThemeResource StudioWorkspaceCanvasBrush}"
+            Background="{ThemeResource StudioDialogSurfaceBrush}"
             BorderBrush="{ThemeResource StudioCardBorderBrush}"
             BorderThickness="1"
             CornerRadius="12">
 
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="236" />
+                    <ColumnDefinition Width="268" />
                     <ColumnDefinition Width="1" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
                 <!-- Left Step Navigation Pane -->
-                <Grid
+                <Border
                     Grid.Column="0"
-                    Padding="18"
-                    Background="{ThemeResource StudioSidebarBackgroundBrush}">
+                    Background="{ThemeResource StudioDialogSidebarBrush}"
+                    CornerRadius="11,0,0,11">
+                <Grid
+                    Padding="16">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
@@ -274,7 +276,7 @@
                     <Border
                         Grid.Row="3"
                         Padding="11"
-                        Background="{ThemeResource StudioSidebarCardFillBrush}"
+                        Background="{ThemeResource StudioDialogCardFillBrush}"
                         BorderBrush="{ThemeResource StudioCardBorderBrush}"
                         BorderThickness="1"
                         CornerRadius="9">
@@ -317,12 +319,13 @@
                         </StackPanel>
                     </Border>
                 </Grid>
+                </Border>
 
                 <!-- Vertical Divider -->
                 <Rectangle Grid.Column="1" Fill="{ThemeResource StudioSplitDividerBrush}" />
 
                 <!-- Right Main Guide Content Pane -->
-                <Grid Grid.Column="2" Background="{ThemeResource StudioWorkspaceCanvasBrush}">
+                <Grid Grid.Column="2" Background="Transparent">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="1" />
@@ -928,10 +931,12 @@
                     <Rectangle Grid.Row="3" Fill="{ThemeResource StudioSplitDividerBrush}" />
 
                     <!-- Bottom Action Bar -->
-                    <Grid
+                    <Border
                         Grid.Row="4"
+                        Background="{ThemeResource StudioDialogFooterBrush}"
+                        CornerRadius="0,0,11,0">
+                    <Grid
                         Padding="22,13"
-                        Background="{ThemeResource StudioWorkspaceCardFillBrush}"
                         ColumnSpacing="10">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -971,6 +976,7 @@
                             Click="OnNextOrFinishClick"
                             Style="{ThemeResource StudioPrimaryButtonStyle}" />
                     </Grid>
+                    </Border>
                 </Grid>
             </Grid>
         </Border>

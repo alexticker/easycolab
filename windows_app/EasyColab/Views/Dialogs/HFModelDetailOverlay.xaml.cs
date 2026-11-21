@@ -185,7 +185,7 @@ public sealed partial class HFModelDetailOverlay : UserControl
     {
         WeightFilesStack.Children.Clear();
 
-        var rowFill = ResolveThemeBrush("StudioWorkspaceCardFillBrush");
+        var rowFill = ResolveThemeBrush("StudioDialogCardFillBrush");
         var primaryBrush = ResolveThemeBrush("StudioTextPrimaryBrush");
         var secondaryBrush = ResolveThemeBrush("StudioTextSecondaryBrush");
         var accentBrush = ResolveThemeBrush("StudioSystemAccentBrush");

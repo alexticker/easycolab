@@ -250,7 +250,7 @@ public sealed partial class AddCustomHFModelDialog : UserControl
 
         var accentBrush = ResolveThemeBrush("StudioSystemAccentBrush");
         var accentFillBrush = ResolveThemeBrush("StudioAccentBlueFillBrush");
-        var cardIdleFill = ResolveThemeBrush("StudioWorkspaceCardFillBrush");
+        var cardIdleFill = ResolveThemeBrush("StudioDialogCardFillBrush");
         var cardIdleBorder = ResolveThemeBrush("StudioCardBorderBrush");
         var primaryText = ResolveThemeBrush("StudioTextPrimaryBrush");
         var secondaryText = ResolveThemeBrush("StudioTextSecondaryBrush");

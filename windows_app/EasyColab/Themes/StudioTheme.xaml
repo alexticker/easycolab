@@ -16,6 +16,11 @@
             <SolidColorBrush x:Key="StudioSidebarCardFillBrush" Color="#0EFFFFFF" />
             <SolidColorBrush x:Key="StudioWorkspaceCanvasBrush" Color="#0AFFFFFF" />
             <SolidColorBrush x:Key="StudioWorkspaceCardFillBrush" Color="#0FFFFFFF" />
+            <!-- Opaque Fluent 2 surfaces for modal dialogs / overlays floating above main content -->
+            <SolidColorBrush x:Key="StudioDialogSurfaceBrush" Color="#FF202227" />
+            <SolidColorBrush x:Key="StudioDialogSidebarBrush" Color="#FF191B20" />
+            <SolidColorBrush x:Key="StudioDialogCardFillBrush" Color="#FF2A2D35" />
+            <SolidColorBrush x:Key="StudioDialogFooterBrush" Color="#FF1B1D22" />
             <SolidColorBrush x:Key="StudioLogHeaderBackgroundBrush" Color="#00000000" />
             <SolidColorBrush x:Key="StudioLogPanelBackgroundBrush" Color="#0AFFFFFF" />
             <SolidColorBrush x:Key="StudioLogTerminalFillBrush" Color="#FF111318" />
@@ -58,6 +63,11 @@
             <SolidColorBrush x:Key="StudioSidebarCardFillBrush" Color="#B3FFFFFF" />
             <SolidColorBrush x:Key="StudioWorkspaceCanvasBrush" Color="#80FFFFFF" />
             <SolidColorBrush x:Key="StudioWorkspaceCardFillBrush" Color="#D9FFFFFF" />
+            <!-- Opaque Fluent 2 surfaces for modal dialogs / overlays floating above main content -->
+            <SolidColorBrush x:Key="StudioDialogSurfaceBrush" Color="#FFF9F9F9" />
+            <SolidColorBrush x:Key="StudioDialogSidebarBrush" Color="#FFF2F3F5" />
+            <SolidColorBrush x:Key="StudioDialogCardFillBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="StudioDialogFooterBrush" Color="#FFF3F4F6" />
             <SolidColorBrush x:Key="StudioLogHeaderBackgroundBrush" Color="#00000000" />
             <SolidColorBrush x:Key="StudioLogPanelBackgroundBrush" Color="#80FFFFFF" />
             <SolidColorBrush x:Key="StudioLogTerminalFillBrush" Color="#FF13161C" />
