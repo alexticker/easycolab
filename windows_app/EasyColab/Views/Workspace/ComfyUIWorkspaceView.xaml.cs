@@ -601,8 +601,6 @@ public sealed partial class ComfyUIWorkspaceView : UserControl
         var vm = ViewModel;
         bool isInstallingThis = !string.IsNullOrEmpty(vm.ComfyInstallingPackId) && vm.ComfyInstallingPackId == pack.Id;
         bool isAnyBusy = vm.ComfyDownloadingWeight || !string.IsNullOrEmpty(vm.ComfyInstallingPackId) || vm.ComfyStarting;
-        bool isPrimaryRecommended = pack.Id == "wan22_i2v_flf2v";
-        bool isDark = ActualTheme == ElementTheme.Dark;
 
         var accentColor = StudioColors.SystemAccent(ActualTheme);
         var greenColor = StudioColors.SystemGreen(ActualTheme);
@@ -615,15 +613,11 @@ public sealed partial class ComfyUIWorkspaceView : UserControl
         var pillNeutralBrush = ResolveThemeBrush("StudioPrimaryOpacity06Brush");
 
         // Card fill & border
-        w.Root.Background = isPrimaryRecommended && !pack.Ready
-            ? new SolidColorBrush(StudioColors.WithOpacity(accentColor, isDark ? 0.10 : 0.045))
-            : inputFillBrush;
+        w.Root.Background = inputFillBrush;
         w.Root.BorderBrush = pack.Ready
             ? new SolidColorBrush(StudioColors.WithOpacity(greenColor, 0.45))
-            : (isPrimaryRecommended
-                ? new SolidColorBrush(StudioColors.WithOpacity(accentColor, 0.45))
-                : cardBorderBrush);
-        w.Root.BorderThickness = new Thickness((isPrimaryRecommended || pack.Ready) ? 1.1 : 0.7);
+            : cardBorderBrush;
+        w.Root.BorderThickness = new Thickness(pack.Ready ? 1.1 : 0.7);
 
         // Left icon
         w.IconBox.Background = pack.Ready
@@ -641,16 +635,8 @@ public sealed partial class ComfyUIWorkspaceView : UserControl
         w.TitleText.Foreground = primaryBrush;
 
         w.BadgeText.Text = pack.LocalizedBadge;
-        if (isPrimaryRecommended)
-        {
-            w.BadgeText.Foreground = new SolidColorBrush(Microsoft.UI.Colors.White);
-            w.BadgePill.Background = accentBrush;
-        }
-        else
-        {
-            w.BadgeText.Foreground = accentBrush;
-            w.BadgePill.Background = new SolidColorBrush(StudioColors.WithOpacity(accentColor, 0.13));
-        }
+        w.BadgeText.Foreground = accentBrush;
+        w.BadgePill.Background = new SolidColorBrush(StudioColors.WithOpacity(accentColor, 0.13));
 
         w.ReadyPill.Visibility = pack.Ready ? Visibility.Visible : Visibility.Collapsed;
         w.ReadyPill.Background = new SolidColorBrush(StudioColors.WithOpacity(greenColor, 0.13));

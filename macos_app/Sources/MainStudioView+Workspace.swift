@@ -518,7 +518,6 @@ extension MainStudioView {
     func comfyPresetPackRow(_ pack: ComfyPresetPackItem, palette: StudioPalette) -> some View {
         let isInstallingThis = vm.comfyInstallingPackId == pack.id
         let isAnyBusy = vm.comfyDownloadingWeight || !vm.comfyInstallingPackId.isEmpty || vm.comfyStarting
-        let isPrimaryRecommended = pack.id == "wan22_i2v_flf2v"
 
         return VStack(alignment: .leading, spacing: 9) {
             HStack(alignment: .top, spacing: 12) {
@@ -539,12 +538,10 @@ extension MainStudioView {
 
                         Text(pack.localizedBadge)
                             .font(.system(size: 10.5, weight: .semibold))
-                            .foregroundStyle(isPrimaryRecommended ? Color.white : Color.accentColor)
+                            .foregroundStyle(Color.accentColor)
                             .padding(.horizontal, 7)
                             .padding(.vertical, 2)
-                            .background(
-                                Capsule().fill(isPrimaryRecommended ? Color.accentColor : Color.accentColor.opacity(0.13))
-                            )
+                            .background(Capsule().fill(Color.accentColor.opacity(0.13)))
 
                         if pack.ready {
                             Text(L("已配齐就绪", "Ready"))
@@ -661,15 +658,13 @@ extension MainStudioView {
         .padding(12)
         .background(
             RoundedRectangle(cornerRadius: 10)
-                .fill(isPrimaryRecommended && !pack.ready
-                      ? Color.accentColor.opacity(colorScheme == .dark ? 0.10 : 0.045)
-                      : palette.inputFill)
+                .fill(palette.inputFill)
         )
         .overlay(
             RoundedRectangle(cornerRadius: 10)
                 .strokeBorder(
-                    pack.ready ? Color.green.opacity(0.45) : (isPrimaryRecommended ? Color.accentColor.opacity(0.45) : palette.cardBorder),
-                    lineWidth: (isPrimaryRecommended || pack.ready) ? 1.1 : 0.7
+                    pack.ready ? Color.green.opacity(0.45) : palette.cardBorder,
+                    lineWidth: pack.ready ? 1.1 : 0.7
                 )
         )
     }
